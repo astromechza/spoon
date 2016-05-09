@@ -9,6 +9,7 @@ import (
     "github.com/op/go-logging"
 
     "github.com/AstromechZA/spoon/conf"
+    "github.com/AstromechZA/spoon/sink"
 )
 
 var log = logging.MustGetLogger("spoon.agents")
@@ -38,7 +39,7 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
 
 // SpawnAgent will begin running the given agent in a loop based on the
 // interval for that agent.
-func SpawnAgent(agent interface{}) error {
+func SpawnAgent(agent interface{}, sink sink.Sink) error {
     agentO, ok := agent.(Agent)
     if ok != true {
         return fmt.Errorf("Failed to cast interface %v to Agent", agent)
@@ -60,6 +61,7 @@ func SpawnAgent(agent interface{}) error {
                 log.Errorf("tick for agent %v returned an error after %v: %v", conf.Path, tickElapsed.String(), err.Error())
             } else {
                 log.Debugf("tick for agent %v returned a value after %v: %v", conf.Path, tickElapsed.String(), value)
+                sink.Put(conf.Path, value)
             }
 
             // now calculate time to sleep to meet the next tick time

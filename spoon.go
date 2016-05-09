@@ -9,7 +9,7 @@ import (
 
     "github.com/AstromechZA/spoon/conf"
     "github.com/AstromechZA/spoon/agents"
-
+    "github.com/AstromechZA/spoon/sink"
     slogging "github.com/AstromechZA/spoon/logging"
 )
 
@@ -54,6 +54,9 @@ func main() {
     // the config
     slogging.Reconfigure(&cfg.Logging)
 
+    // build sink
+    activeSink := sink.NewLoggingSink()
+
     // now spawn each of the agents
     for i, c := range cfg.Agents {
         log.Debugf("Building agent %v: %v", i, c)
@@ -62,7 +65,7 @@ func main() {
             log.Errorf("Failed to build agent %v: %v", &c, err.Error())
             continue
         }
-        err = agents.SpawnAgent(agent)
+        err = agents.SpawnAgent(agent, &activeSink)
         if err != nil {
             log.Errorf("Failed to spawn agent %v: %v", &c, err.Error())
         }
