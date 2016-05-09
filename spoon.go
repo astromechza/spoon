@@ -57,7 +57,7 @@ func main() {
     // now spawn each of the agents
     for i, c := range cfg.Agents {
         log.Debugf("Building agent %v: %v", i, c)
-        agent, err := agents.BuildAgent(c)
+        agent, err := agents.BuildAgent(&c)
         if err != nil {
             log.Errorf("Failed to build agent %v: %v", &c, err.Error())
             continue
