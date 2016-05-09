@@ -4,6 +4,7 @@ import (
     "time"
 
     "github.com/AstromechZA/spoon/conf"
+    "github.com/AstromechZA/spoon/sink"
 )
 
 type timeAgent struct {
@@ -18,6 +19,6 @@ func (self *timeAgent) GetConfig() conf.SpoonConfigAgent {
     return self.config
 }
 
-func (self *timeAgent) Tick() (float64, error) {
-    return float64(time.Now().UnixNano()), nil
+func (self *timeAgent) Tick(sink sink.Sink) error {
+    return sink.Put(self.config.Path, float64(time.Now().UnixNano()))
 }

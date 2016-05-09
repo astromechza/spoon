@@ -21,7 +21,7 @@ type Agent interface {
     GetConfig() conf.SpoonConfigAgent
 
     // fetch a result for this agent
-    Tick() (float64, error)
+    Tick(sink sink.Sink) error
 }
 
 // BuildAgent will return a pointer to a constructed object that follows
@@ -55,13 +55,12 @@ func SpawnAgent(agent interface{}, sink sink.Sink) error {
         for {
             // do call to agent
             tickStart = time.Now()
-            value, err := agent.Tick()
+            err := agent.Tick(sink)
             tickElapsed = time.Since(tickStart)
             if err != nil {
                 log.Errorf("tick for agent %v returned an error after %v: %v", conf.Path, tickElapsed.String(), err.Error())
             } else {
-                log.Debugf("tick for agent %v returned a value after %v: %v", conf.Path, tickElapsed.String(), value)
-                sink.Put(conf.Path, value)
+                log.Debugf("tick for agent %v returned after %v", conf.Path, tickElapsed.String())
             }
 
             // now calculate time to sleep to meet the next tick time
