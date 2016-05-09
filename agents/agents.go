@@ -1,5 +1,63 @@
 package agents
 
-type Agent struct {
-    Tick() err
+import (
+    "strings"
+    "time"
+    "math"
+    "fmt"
+
+    "github.com/op/go-logging"
+
+    "github.com/AstromechZA/spoon/conf"
+)
+
+var log = logging.MustGetLogger("spoon.agents")
+
+// The Agent type is an object that can gather and return a result.
+type Agent interface {
+
+    // return the config object for this agent
+    GetConfig() conf.SpoonConfigAgent
+
+    // fetch a result for this agent
+    Tick() (float64, error)
+}
+
+// BuildAgent will return a pointer to a constructed object that follows
+// the Agent interface.
+// This method will return an error if there is no constructor for the
+// agent type or if an error occurs while constructing the object.
+func BuildAgent(agentConfig conf.SpoonConfigAgent) (*Agent, error) {
+    switch strings.ToLower(agentConfig.Type) {
+    default:
+        return nil, fmt.Errorf("Unrecognised agent type '%v'", agentConfig.Type)
+    }
+}
+
+// SpawnAgent will begin running the given agent in a loop based on the
+// interval for that agent.
+func SpawnAgent(a *Agent) error {
+    agent := (*a)
+    conf := agent.GetConfig()
+    log.Infof("Starting %s agent %s with interval %.2f seconds", conf.Type, conf.Path, conf.Interval)
+
+    intervalNanos := float64(conf.Interval) * float64(time.Second)
+    startTime := time.Now().UnixNano()
+
+    for {
+        // do call to agent
+        log.Debugf("tick %v", conf.Path)
+        value, err := agent.Tick()
+        log.Debugf("tick done")
+        if err != nil {
+            log.Errorf("tick for agent %v returned an error: %v", conf.Path, err.Error())
+        } else {
+            log.Debugf("tick for agent %v returned a value: %v", conf.Path, value)
+        }
+
+        // now calculate time to sleep to meet the next tick time
+        sleep := intervalNanos * (1.0 - math.Mod(float64(time.Now().UnixNano() - startTime) / intervalNanos, float64(1)))
+        time.Sleep(time.Duration(sleep))
+    }
+
 }

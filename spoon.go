@@ -4,12 +4,11 @@ import (
     "flag"
     "os"
     "os/signal"
-    "time"
-    "math"
 
     "github.com/op/go-logging"
 
     "github.com/AstromechZA/spoon/conf"
+    "github.com/AstromechZA/spoon/agents"
 
     slogging "github.com/AstromechZA/spoon/logging"
 )
@@ -28,36 +27,6 @@ what agents are configured.
 `
 
 var log = logging.MustGetLogger("spoon")
-
-
-func spawnAgent(agentConf *conf.SpoonConfigAgent, agentNumber int) {
-    // make sure we pass the args by value.. otherwise our pointer is suddenly
-    // different
-
-    // Agent.Spawn(agentConf, agentNumber)
-
-    go func(aconf conf.SpoonConfigAgent, i int) {
-        log.Infof("Starting %s agent %s with interval %.2f seconds", aconf.Type, aconf.Path, aconf.Interval)
-
-        // Agent.New()
-
-        // store reference point
-        // Agent.IntervalNano
-        intervalNanos := float64(aconf.Interval) * float64(time.Second)
-        startTime := time.Now().UnixNano()
-        for {
-            // do call to agent
-            log.Debugf("tick %d", i)
-            // Agent.call()
-            log.Debugf("tick done")
-
-            // now calculate time to sleep to meet the next tick time
-            sleep := intervalNanos * (1.0 - math.Mod(float64(time.Now().UnixNano() - startTime) / intervalNanos, float64(1)))
-            time.Sleep(time.Duration(sleep))
-        }
-    }(*agentConf, agentNumber)
-}
-
 
 func main() {
 
@@ -86,8 +55,17 @@ func main() {
     slogging.Reconfigure(&cfg.Logging)
 
     // now spawn each of the agents
-    for i, a := range cfg.Agents {
-        spawnAgent(&a, i)
+    for i, c := range cfg.Agents {
+        log.Debugf("Building agent %v: %v", i, c)
+        agent, err := agents.BuildAgent(c)
+        if err != nil {
+            log.Errorf("Failed to build agent %v: %v", &c, err.Error())
+            continue
+        }
+        err = agents.SpawnAgent(agent)
+        if err != nil {
+            log.Errorf("Failed to spawn agent %v: %v", &c, err.Error())
+        }
     }
 
     // instead of sitting in a for loop or something, we wait for sigint
