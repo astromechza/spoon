@@ -32,6 +32,8 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
     switch strings.ToLower(agentConfig.Type) {
     case "time":
         return NewTimeAgent(agentConfig)
+    case "meta":
+        return NewMetaAgent(agentConfig)
     default:
         return nil, fmt.Errorf("Unrecognised agent type '%v'", agentConfig.Type)
     }
