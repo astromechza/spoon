@@ -48,21 +48,22 @@ func SpawnAgent(agent interface{}) error {
         log.Infof("Starting %s agent %s with interval %.2f seconds", conf.Type, conf.Path, conf.Interval)
 
         intervalNanos := float64(conf.Interval) * float64(time.Second)
-        startTime := time.Now().UnixNano()
-
+        spawnTime := time.Now().UnixNano()
+        var tickStart time.Time
+        var tickElapsed time.Duration
         for {
             // do call to agent
-            log.Debugf("tick %v", conf.Path)
+            tickStart = time.Now()
             value, err := agent.Tick()
-            log.Debugf("tick done")
+            tickElapsed = time.Since(tickStart)
             if err != nil {
-                log.Errorf("tick for agent %v returned an error: %v", conf.Path, err.Error())
+                log.Errorf("tick for agent %v returned an error after %v: %v", conf.Path, tickElapsed.String(), err.Error())
             } else {
-                log.Debugf("tick for agent %v returned a value: %v", conf.Path, value)
+                log.Debugf("tick for agent %v returned a value after %v: %v", conf.Path, tickElapsed.String(), value)
             }
 
             // now calculate time to sleep to meet the next tick time
-            sleep := intervalNanos * (1.0 - math.Mod(float64(time.Now().UnixNano() - startTime) / intervalNanos, float64(1)))
+            sleep := intervalNanos * (1.0 - math.Mod(float64(time.Now().UnixNano() - spawnTime) / intervalNanos, float64(1)))
             time.Sleep(time.Duration(sleep))
         }
     }(agentO)
