@@ -28,6 +28,12 @@ deploy the daemon to my home servers.
 3. config validation
 4. improve agent error handling:
     rather than throwing errors in multivalued agents, just log 'warn' for them.
+5. add 'enabled' option to configs
+6. add a -generate-config /path flag that generates an example config file
+7. add whitelist option to disk agent (whitelist specific disks to show)
+8. add hostname to path or have it as an optional interpolated field in the main path name
+9. add a -validate-config flag
+10. version number?
 
 ## Agents to add
 
@@ -40,6 +46,8 @@ deploy the daemon to my home servers.
     - casting to a float64 must be done carefully. perhaps we should have a bit
         of regex to identify the first possible number and then we use that
         value. must lookout for negative values too.
+- load average?
+- docker cpu and mem stats? (just cos gopsutil library supports this)
 
 ## Why 'Spoon'?
 
