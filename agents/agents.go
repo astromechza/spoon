@@ -30,6 +30,10 @@ type Agent interface {
 // agent type or if an error occurs while constructing the object.
 func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
     switch strings.ToLower(agentConfig.Type) {
+    case "cpu":
+        return NewCPUAgent(agentConfig)
+    case "mem":
+        return NewMemAgent(agentConfig)
     case "time":
         return NewTimeAgent(agentConfig)
     case "meta":

@@ -22,6 +22,20 @@ deploy the daemon to my home servers.
 
 1. Add more agent types
 2. Add carbon packet sending
+3. config validation
+
+## Agents to add
+
+- disk_agent (disk usage and IO of a given partition)
+- net_agent (network usage across one or more interfaces)
+- cmd_agent (get float64 output of a command)
+    - cmd_agent is what users will use to add their own metrics
+    - they can call out to any executeable binary
+    - must be aware that this may be slower than other agents due to calling
+        a process
+    - casting to a float64 must be done carefully. perhaps we should have a bit
+        of regex to identify the first possible number and then we use that
+        value. must lookout for negative values too.
 
 ## Why 'Spoon'?
 

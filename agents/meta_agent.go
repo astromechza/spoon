@@ -58,7 +58,7 @@ func (a *metaAgent) doCPU(sink sink.Sink) error {
 
     if a.hasPrevCPU {
         delta := now.Sub(a.prevCPUTime).Seconds() * float64(a.numCPU)
-        percent := calculateCPUPercent(a.prevCPUTotal, total, delta, a.numCPU)
+        percent := a.calculateCPUPercent(a.prevCPUTotal, total, delta, a.numCPU)
         if err = sink.Put(a.config.Path + ".cpu_percent", percent); err != nil {
             return err
         }
@@ -71,7 +71,7 @@ func (a *metaAgent) doCPU(sink sink.Sink) error {
     return nil
 }
 
-func calculateCPUPercent(t1, t2 float64, delta float64, numcpu int) float64 {
+func (a *metaAgent) calculateCPUPercent(t1, t2 float64, delta float64, numcpu int) float64 {
     if delta == 0 { return 0 }
     return (((t2 - t1) / delta) * 100) * float64(numcpu)
 }
