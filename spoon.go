@@ -2,6 +2,8 @@ package main
 
 import (
     "flag"
+    "fmt"
+    "encoding/json"
     "os"
     "os/signal"
 
@@ -31,7 +33,10 @@ var log = logging.MustGetLogger("spoon")
 func main() {
 
     // first set up config flag options
-    configFlag := flag.String("config", "/etc/spoon.json", "Path to a Spoon config file.")
+    configFlag := flag.String("config", "", "Path to a Spoon config file.")
+    generateFlag := flag.Bool("generate", false, "Generate a new example config and print it to stdout.")
+    validateFlag := flag.Bool("validate", false, "Validate the config passed in via '-config'.")
+
     // set a more verbose usage message.
     flag.Usage = func() {
         os.Stderr.WriteString(usageString)
@@ -40,11 +45,38 @@ func main() {
     // parse them
     flag.Parse()
 
+    // first do arg checking
+    if (*generateFlag) {
+        if (*validateFlag) {
+            os.Stderr.WriteString("Cannot use both -validate and -generate.\n")
+            os.Exit(1)
+        }
+        if (*configFlag) != "" {
+            os.Stderr.WriteString("Cannot use both -generate and -config.\n")
+            os.Exit(1)
+        }
+    }
+
+    // first handle generate and validate
+    if (*generateFlag) {
+        bytes, err := json.MarshalIndent(GenerateExampleConfig(), "", "    ")
+        if err != nil {
+            fmt.Printf("Failed to serialise config: %v", err.Error())
+            os.Exit(1)
+        }
+        fmt.Println(string(bytes))
+        os.Exit(0)
+    }
+
+    // TODO - implement validate
+
     // set up initial logging to stdout
     slogging.Initial()
     // load the config file
-    log.Infof("Loading config from %s", *configFlag)
-    cfg, err := conf.Load(configFlag)
+    configPath := (*configFlag)
+    if configPath == "" { configPath = "/etc/spoon.json" }
+    log.Infof("Loading config from %s", configPath)
+    cfg, err := conf.Load(&configPath)
     if err != nil {
         log.Criticalf("Failed to load config: %s", err.Error())
         os.Exit(1)
@@ -78,5 +110,40 @@ func main() {
     for sig := range signalChannel {
         log.Infof("Received %v signal. Stopping.", sig)
         os.Exit(0)
+    }
+}
+
+func GenerateExampleConfig() *conf.SpoonConfig {
+    return &conf.SpoonConfig{
+        Logging: conf.SpoonConfigLog{
+            Path: "-",
+        },
+        Agents: []conf.SpoonConfigAgent{
+            conf.SpoonConfigAgent{
+                Type: "cpu",
+                Interval: float32(60),
+                Path: "example.cpu",
+            },
+            conf.SpoonConfigAgent{
+                Type: "disk",
+                Interval: float32(60),
+                Path: "example.disk",
+            },
+            conf.SpoonConfigAgent{
+                Type: "mem",
+                Interval: float32(60),
+                Path: "example.mem",
+            },
+            conf.SpoonConfigAgent{
+                Type: "meta",
+                Interval: float32(30),
+                Path: "example.spoon",
+            },
+            conf.SpoonConfigAgent{
+                Type: "time",
+                Interval: float32(10),
+                Path: "example.time",
+            },
+        },
     }
 }

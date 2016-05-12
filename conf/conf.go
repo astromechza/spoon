@@ -7,22 +7,22 @@ import (
 
 // SpoonConfigAgent is a sub structure of SpoonConfig
 type SpoonConfigAgent struct {
-    Type string
-    Interval float32
-    Path string
-    Settings map[string]interface{}
+    Type string `json:"type"`
+    Interval float32 `json:"interval"`
+    Path string `json:"path"`
+    Settings map[string]interface{} `json:"settings"`
 }
 
 // SpoonConfigLog is a sub structure of SpoonConfig
 type SpoonConfigLog struct {
-    Path string
+    Path string `json:"path"`
     RotateSize int64 `json:"rotate_size"`
 }
 
 // SpoonConfig is the definition of the json config structure
 type SpoonConfig struct {
-    Logging SpoonConfigLog
-    Agents []SpoonConfigAgent
+    Logging SpoonConfigLog `json:"logging"`
+    Agents []SpoonConfigAgent `json:"agents"`
 }
 
 // Load the config information from the file on disk
