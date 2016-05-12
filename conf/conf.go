@@ -7,6 +7,7 @@ import (
 
 // SpoonConfigAgent is a sub structure of SpoonConfig
 type SpoonConfigAgent struct {
+    Enabled bool `json:"enabled"`
     Type string `json:"type"`
     Interval float32 `json:"interval"`
     Path string `json:"path"`

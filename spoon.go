@@ -91,6 +91,10 @@ func main() {
 
     // now spawn each of the agents
     for i, c := range cfg.Agents {
+        if c.Enabled == false {
+            log.Infof("Skipping agent %v: %v because it is disabled.", i, c)
+            continue
+        }
         log.Debugf("Building agent %v: %v", i, c)
         agent, err := agents.BuildAgent(&c)
         if err != nil {
@@ -138,11 +142,13 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Type: "meta",
                 Interval: float32(30),
                 Path: "example.spoon",
+                Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "time",
                 Interval: float32(10),
                 Path: "example.time",
+                Enabled: true,
             },
         },
     }
