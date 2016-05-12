@@ -24,14 +24,12 @@ deploy the daemon to my home servers.
 ## TODO
 
 - **Add actual carbon packet sending**
-- config validation
 - improve agent error handling:
     rather than throwing errors in multivalued agents, just log 'warn' for them.
-- add 'enabled' option to configs
 - add whitelist option to disk agent (whitelist specific disks to show)
 - add hostname to path or have it as an optional interpolated field in the main path name
-- add a -validate-config flag
-- add a -generate-config /path flag that generates an example config file
+- config validation
+- add a -validate-config flag that exits after config validation
 - version number?
 
 ## Agents to add
