@@ -51,7 +51,5 @@ func (a *memAgent) Tick(sink sink.Sink) error {
     if err != nil { return err }
 
     err = sink.Put(fmt.Sprintf("%s.swap.free", a.config.Path), float64(smemInfo.Free))
-    if err != nil { return err }
-
-    return nil
+    return err
 }

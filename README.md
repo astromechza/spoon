@@ -23,6 +23,8 @@ deploy the daemon to my home servers.
 1. Add more agent types
 2. Add carbon packet sending
 3. config validation
+4. improve agent error handling:
+    rather than throwing errors in multivalued agents, just log 'warn' for them.
 
 ## Agents to add
 
