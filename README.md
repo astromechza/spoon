@@ -16,6 +16,9 @@ deploy the daemon to my home servers.
 
 - 'time': just returns the unix nanoseconds
 - 'meta': returns the cpu percent and RSS usage of the Spoon process.
+- 'cpu': returns cpu percentage per core
+- 'disk': returns disk usage and io counters if available per physical partition and disk
+- 'mem': returns system memory and swap usage
 - ...
 
 ## TODO
@@ -28,7 +31,6 @@ deploy the daemon to my home servers.
 
 ## Agents to add
 
-- disk_agent (disk usage and IO of a given partition)
 - net_agent (network usage across one or more interfaces)
 - cmd_agent (get float64 output of a command)
     - cmd_agent is what users will use to add their own metrics
