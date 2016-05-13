@@ -19,6 +19,7 @@ deploy the daemon to my home servers.
 - 'cpu': returns cpu percentage per core
 - 'disk': returns disk usage and io counters if available per physical partition and disk
 - 'mem': returns system memory and swap usage
+- 'uptime': just returns the machines uptime value
 - ...
 
 ## TODO
@@ -34,7 +35,6 @@ deploy the daemon to my home servers.
 
 ## Agents to add
 
-- net_agent (network usage across one or more interfaces)
 - cmd_agent (get float64 output of a command)
     - cmd_agent is what users will use to add their own metrics
     - they can call out to any executeable binary

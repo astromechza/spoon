@@ -33,7 +33,7 @@ func (a *diskAgent) Tick(sink sink.Sink) error {
         for _, p := range parts {
             usage, err := disk.Usage(p.Mountpoint)
             if err == nil {
-                prefixPath := fmt.Sprintf("%s.disk.%s", a.config.Path, p.Device)
+                prefixPath := fmt.Sprintf("%s.%s", a.config.Path, p.Device)
 
                 err = sink.Put(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
                 if err != nil { return err }

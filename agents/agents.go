@@ -38,8 +38,12 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
         return NewMemAgent(agentConfig)
     case "time":
         return NewTimeAgent(agentConfig)
+    case "uptime":
+        return NewUpTimeAgent(agentConfig)
     case "meta":
         return NewMetaAgent(agentConfig)
+    case "net":
+        return NewNetAgent(agentConfig)
     default:
         return nil, fmt.Errorf("Unrecognised agent type '%v'", agentConfig.Type)
     }

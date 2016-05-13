@@ -86,6 +86,12 @@ func main() {
     // the config
     slogging.Reconfigure(&cfg.Logging)
 
+    hn, err := os.Hostname()
+    if err == nil {
+        log.Infof("Hostname: %v", hn)
+    }
+
+
     // build sink
     activeSink := sink.NewLoggingSink()
 
@@ -148,6 +154,21 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Type: "time",
                 Interval: float32(10),
                 Path: "example.time",
+                Enabled: true,
+            },
+            conf.SpoonConfigAgent{
+                Type: "uptime",
+                Interval: float32(60),
+                Path: "example.uptime",
+                Enabled: true,
+            },
+            conf.SpoonConfigAgent{
+                Type: "net",
+                Interval: float32(60),
+                Path: "example.net",
+                Settings: map[string]interface{}{
+                    "nic_regex": "e(th|n)\\d",
+                },
                 Enabled: true,
             },
         },
