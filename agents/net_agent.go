@@ -41,7 +41,7 @@ func (a *netAgent) Tick(sink sink.Sink) error {
     for _, nicio := range iocounters {
         m, _ := regexp.MatchString(nicre, nicio.Name)
         if m == false {
-            log.Infof("Skipping %v because it didn't match nic_regex", nicio.Name)
+            log.Debugf("Skipping %v because it didn't match nic_regex", nicio.Name)
             continue
         }
         prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)

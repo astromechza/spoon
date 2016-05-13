@@ -42,6 +42,7 @@ func main() {
     generateFlag := flag.Bool("generate", false, "Generate a new example config and print it to stdout.")
     validateFlag := flag.Bool("validate", false, "Validate the config passed in via '-config'.")
     versionFlag := flag.Bool("version", false, "Print the version string.")
+    debugFlag := flag.Bool("debug", false, "Print debug logging.")
 
     // set a more verbose usage message.
     flag.Usage = func() {
@@ -107,7 +108,7 @@ func main() {
 
     // now that we have the config, we can reconfigure the logger according to
     // the config
-    slogging.Reconfigure(&cfg.Logging)
+    slogging.Reconfigure(&cfg.Logging, *debugFlag)
 
     // build sink
     activeSink := sink.NewLoggingSink()

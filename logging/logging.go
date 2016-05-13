@@ -26,19 +26,30 @@ func Initial() {
 // so that they get seen in both the file and stream
 
 // Reconfigure the logging to follow the given logging configuration
-func Reconfigure(logcfg *conf.SpoonConfigLog) {
+func Reconfigure(logcfg *conf.SpoonConfigLog, debug bool) {
     log.Debugf("Loaded logging configuration: %v", *logcfg)
 
-    if logcfg.Path != "-" {
+    var logBackend logging.Backend
+    if logcfg.Path == "-" {
+        logBackend = logging.NewLogBackend(os.Stdout, "", 0)
+    } else {
         log.Debugf("Logging configuration specified path: %s", logcfg.Path)
         rotatingWriter, err := NewRotatingWriter(logcfg.Path, logcfg.RotateSize)
         if err == nil {
-            log.Infof("Switching to %s", logcfg.Path)
-            logging.SetBackend(logging.NewBackendFormatter(logging.NewLogBackend(rotatingWriter, "", 0), logFormat))
+            logBackend = logging.NewLogBackend(rotatingWriter, "", 0)
         } else {
             log.Errorf("Error during log reconfiguration: %s", err.Error())
         }
     }
+
+    backend := logging.NewBackendFormatter(logBackend, logFormat)
+    lvlBackend := logging.AddModuleLevel(backend)
+    if debug == false {
+        lvlBackend.SetLevel(logging.INFO, "")
+    } else {
+        log.Info("Debug logging enabled!")
+    }
+    logging.SetBackend(lvlBackend)
 }
 
 type RotatingWriter struct {
