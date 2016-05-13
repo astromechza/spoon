@@ -20,6 +20,8 @@ deploy the daemon to my home servers.
 - 'disk': returns disk usage and io counters if available per physical partition and disk
 - 'mem': returns system memory and swap usage
 - 'uptime': just returns the machines uptime value
+- 'net': returns sent/recv info for interfaces
+- 'cmd': allows user to run their own command
 - ...
 
 ## TODO
@@ -35,14 +37,6 @@ deploy the daemon to my home servers.
 
 ## Agents to add
 
-- cmd_agent (get float64 output of a command)
-    - cmd_agent is what users will use to add their own metrics
-    - they can call out to any executeable binary
-    - must be aware that this may be slower than other agents due to calling
-        a process
-    - casting to a float64 must be done carefully. perhaps we should have a bit
-        of regex to identify the first possible number and then we use that
-        value. must lookout for negative values too.
 - load average?
 - docker cpu and mem stats? (just cos gopsutil library supports this)
 
