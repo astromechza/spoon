@@ -28,6 +28,11 @@ what agents are configured.
 
 `
 
+// SpoonVersion is the version string
+// format should be 'X.YZ'
+// Set this at build time using the -ldflags="-X main.SpoonVersion=X.YZ"
+var SpoonVersion = "<unofficial build>"
+
 var log = logging.MustGetLogger("spoon")
 
 func main() {
@@ -36,6 +41,7 @@ func main() {
     configFlag := flag.String("config", "", "Path to a Spoon config file.")
     generateFlag := flag.Bool("generate", false, "Generate a new example config and print it to stdout.")
     validateFlag := flag.Bool("validate", false, "Validate the config passed in via '-config'.")
+    versionFlag := flag.Bool("version", false, "Print the version string.")
 
     // set a more verbose usage message.
     flag.Usage = func() {
@@ -46,6 +52,11 @@ func main() {
     flag.Parse()
 
     // first do arg checking
+    if (*versionFlag) {
+        fmt.Println("Spoon Version " + SpoonVersion)
+        os.Exit(0)
+    }
+
     if (*generateFlag) {
         if (*validateFlag) {
             os.Stderr.WriteString("Cannot use both -validate and -generate.\n")
