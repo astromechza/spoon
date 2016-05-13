@@ -15,12 +15,12 @@ func NewUpTimeAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
     return &uptimeAgent{config: (*config)}, nil
 }
 
-func (self *uptimeAgent) GetConfig() conf.SpoonConfigAgent {
-    return self.config
+func (a *uptimeAgent) GetConfig() conf.SpoonConfigAgent {
+    return a.config
 }
 
-func (self *uptimeAgent) Tick(sink sink.Sink) error {
+func (a *uptimeAgent) Tick(sink sink.Sink) error {
     ut, err := host.Uptime()
     if err != nil { return err}
-    return sink.Put(self.config.Path, float64(ut))
+    return sink.Put(a.config.Path, float64(ut))
 }

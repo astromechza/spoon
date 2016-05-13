@@ -91,7 +91,6 @@ func main() {
         log.Infof("Hostname: %v", hn)
     }
 
-
     // build sink
     activeSink := sink.NewLoggingSink()
 
@@ -105,11 +104,12 @@ func main() {
         agent, err := agents.BuildAgent(&c)
         if err != nil {
             log.Errorf("Failed to build agent %v: %v", &c, err.Error())
-            continue
+            os.Exit(1)
         }
         err = agents.SpawnAgent(agent, &activeSink)
         if err != nil {
             log.Errorf("Failed to spawn agent %v: %v", &c, err.Error())
+            os.Exit(1)
         }
     }
 
@@ -168,6 +168,19 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Path: "example.net",
                 Settings: map[string]interface{}{
                     "nic_regex": "e(th|n)\\d",
+                },
+                Enabled: true,
+            },
+            conf.SpoonConfigAgent{
+                Type: "cmd",
+                Interval: float32(30),
+                Path: "example.cmd",
+                Settings: map[string]interface{}{
+                    "cmd": []string{
+                        "python",
+                        "-c",
+                        "import random; print 'test.path', random.randint(-100, 100)",
+                    },
                 },
                 Enabled: true,
             },

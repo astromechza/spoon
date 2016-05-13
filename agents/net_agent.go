@@ -27,16 +27,16 @@ func NewNetAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
     return &netAgent{config: (*config), settings: settings}, nil
 }
 
-func (self *netAgent) GetConfig() conf.SpoonConfigAgent {
-    return self.config
+func (a *netAgent) GetConfig() conf.SpoonConfigAgent {
+    return a.config
 }
 
-func (self *netAgent) Tick(sink sink.Sink) error {
+func (a *netAgent) Tick(sink sink.Sink) error {
 
     iocounters, err := net.IOCounters(true)
     if err != nil { return err }
 
-    nicre, ok := self.settings["nic_regex"]
+    nicre, ok := a.settings["nic_regex"]
     if ok == false { nicre = ".*" }
     for _, nicio := range iocounters {
         m, _ := regexp.MatchString(nicre, nicio.Name)
@@ -44,7 +44,7 @@ func (self *netAgent) Tick(sink sink.Sink) error {
             log.Infof("Skipping %v because it didn't match nic_regex", nicio.Name)
             continue
         }
-        prefixPath := fmt.Sprintf("%s.%s", self.config.Path, nicio.Name)
+        prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 
         err = sink.Put(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
         if err != nil { return err }

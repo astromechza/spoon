@@ -15,10 +15,10 @@ func NewTimeAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
     return &timeAgent{config: (*config)}, nil
 }
 
-func (self *timeAgent) GetConfig() conf.SpoonConfigAgent {
-    return self.config
+func (a *timeAgent) GetConfig() conf.SpoonConfigAgent {
+    return a.config
 }
 
-func (self *timeAgent) Tick(sink sink.Sink) error {
-    return sink.Put(self.config.Path, float64(time.Now().UnixNano()))
+func (a *timeAgent) Tick(sink sink.Sink) error {
+    return sink.Put(a.config.Path, float64(time.Now().UnixNano()))
 }

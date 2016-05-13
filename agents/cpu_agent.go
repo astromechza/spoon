@@ -50,8 +50,10 @@ func (a *cpuAgent) Tick(sink sink.Sink) error {
         // if we have a previous total for this cpu
         if a.hasPrevCPU && len(a.prevCPUTotals) > i {
             percent := a.calculateCPUPercent(a.prevCPUTotals[i], totals[i], a.prevCPUBusys[i], busys[i])
-            err = sink.Put(fmt.Sprintf("%s.%v.cpu_percent", a.config.Path, i), percent)
+            subpath := fmt.Sprintf("%s.%v.cpu_percent", a.config.Path, i)
+            err = sink.Put(subpath, percent)
             if err != nil && putError != nil {
+                log.Errorf("Error while putting value for %v: %v", subpath, err.Error())
                 putError = err
             }
         }

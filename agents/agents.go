@@ -44,6 +44,8 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
         return NewMetaAgent(agentConfig)
     case "net":
         return NewNetAgent(agentConfig)
+    case "cmd":
+        return NewCMDAgent(agentConfig)
     default:
         return nil, fmt.Errorf("Unrecognised agent type '%v'", agentConfig.Type)
     }
