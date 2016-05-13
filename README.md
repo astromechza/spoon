@@ -27,8 +27,7 @@ deploy the daemon to my home servers.
 ## TODO
 
 - **Add actual carbon packet sending**
-- improve agent error handling:
-    rather than throwing errors in multivalued agents, just log 'warn' for them.
+- improve agent error handling
 - add whitelist option to disk agent (whitelist specific disks to show)
 - add hostname to path or have it as an optional interpolated field in the main path name
 

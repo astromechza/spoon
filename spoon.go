@@ -171,16 +171,19 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Type: "cpu",
                 Interval: float32(60),
                 Path: "example.cpu",
+                Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "disk",
                 Interval: float32(60),
                 Path: "example.disk",
+                Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "mem",
                 Interval: float32(60),
                 Path: "example.mem",
+                Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "meta",

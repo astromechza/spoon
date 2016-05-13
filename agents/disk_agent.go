@@ -2,6 +2,7 @@ package agents
 
 import (
     "fmt"
+    "strings"
 
     "github.com/shirou/gopsutil/disk"
 
@@ -33,7 +34,7 @@ func (a *diskAgent) Tick(sink sink.Sink) error {
         for _, p := range parts {
             usage, err := disk.Usage(p.Mountpoint)
             if err == nil {
-                prefixPath := fmt.Sprintf("%s.%s", a.config.Path, p.Device)
+                prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
 
                 err = sink.Put(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
                 if err != nil { return err }
@@ -70,7 +71,7 @@ func (a *diskAgent) Tick(sink sink.Sink) error {
 
         // TODO test this on linux
         for path, iostat := range iocounters {
-            prefixPath := fmt.Sprintf("%s.disk.%s", a.config.Path, path)
+            prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(path))
 
             err = sink.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
             if err != nil { return err }
@@ -89,4 +90,11 @@ func (a *diskAgent) Tick(sink sink.Sink) error {
         log.Errorf("Fetching iocounters for system failed: %v", err.Error())
     }
     return nil
+}
+
+func (a *diskAgent) formatDeviceName(device string) string {
+    // first replace all forward slashes with -
+    device = strings.Replace(device, "/", "_", -1)
+    // then trim them off
+    return strings.Trim(device, "_")
 }
