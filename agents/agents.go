@@ -58,6 +58,12 @@ func SpawnAgent(agent interface{}, sink sink.Sink) error {
     if ok != true {
         return fmt.Errorf("Failed to cast interface %v to Agent", agent)
     }
+
+    if agentO.GetConfig().Enabled == false {
+        log.Infof("Skipping agent %v because it is disabled.", agentO.GetConfig())
+        return nil
+    }
+
     go func(agent Agent) {
         conf := agent.GetConfig()
         log.Infof("Starting %s agent %s with interval %.2f seconds", conf.Type, conf.Path, conf.Interval)

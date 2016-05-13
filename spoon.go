@@ -61,24 +61,36 @@ func main() {
     if (*generateFlag) {
         bytes, err := json.MarshalIndent(GenerateExampleConfig(), "", "    ")
         if err != nil {
-            fmt.Printf("Failed to serialise config: %v", err.Error())
+            fmt.Printf("Failed to serialise config: %v\n", err.Error())
             os.Exit(1)
         }
         fmt.Println(string(bytes))
         os.Exit(0)
     }
 
-    // TODO - implement validate
-
-    // set up initial logging to stdout
-    slogging.Initial()
     // load the config file
     configPath := (*configFlag)
     if configPath == "" { configPath = "/etc/spoon.json" }
+
+    // quick validate the config if user asked
+    if (*validateFlag) {
+        err := LoadAndValidateConfig(configPath)
+        if err != nil {
+            fmt.Printf("Config failed validation: %v\n", err.Error())
+            os.Exit(1)
+        }
+        fmt.Printf("No problems found in %v config. Looks good to me!\n", configPath)
+        os.Exit(0)
+    }
+
+    // set up initial logging to stdout
+    slogging.Initial()
+
+    // load config
     log.Infof("Loading config from %s", configPath)
     cfg, err := conf.Load(&configPath)
     if err != nil {
-        log.Criticalf("Failed to load config: %s", err.Error())
+        fmt.Printf("Failed to load config: %v\n", err.Error())
         os.Exit(1)
     }
 
@@ -86,29 +98,29 @@ func main() {
     // the config
     slogging.Reconfigure(&cfg.Logging)
 
+    // build sink
+    activeSink := sink.NewLoggingSink()
+
+    // build the list of real agents
+    agentList := make([]interface{}, len(cfg.Agents))
+    for i, c := range cfg.Agents {
+        agent, err := agents.BuildAgent(&c)
+        if err != nil {
+            os.Exit(1)
+        }
+        agentList[i] = agent
+    }
+
     hn, err := os.Hostname()
     if err == nil {
         log.Infof("Hostname: %v", hn)
     }
 
-    // build sink
-    activeSink := sink.NewLoggingSink()
-
     // now spawn each of the agents
-    for i, c := range cfg.Agents {
-        if c.Enabled == false {
-            log.Infof("Skipping agent %v: %v because it is disabled.", i, c)
-            continue
-        }
-        log.Debugf("Building agent %v: %v", i, c)
-        agent, err := agents.BuildAgent(&c)
+    for _, a := range agentList {
+        err = agents.SpawnAgent(a, &activeSink)
         if err != nil {
-            log.Errorf("Failed to build agent %v: %v", &c, err.Error())
-            os.Exit(1)
-        }
-        err = agents.SpawnAgent(agent, &activeSink)
-        if err != nil {
-            log.Errorf("Failed to spawn agent %v: %v", &c, err.Error())
+            log.Errorf("Failed to spawn agent %v: %v", a, err.Error())
             os.Exit(1)
         }
     }
@@ -121,6 +133,21 @@ func main() {
         log.Infof("Received %v signal. Stopping.", sig)
         os.Exit(0)
     }
+}
+
+func LoadAndValidateConfig(path string) error {
+    cfg, err := conf.Load(&path)
+    if err != nil { return err }
+
+    // check logging config
+
+    // check Sink config
+
+    for _, c := range cfg.Agents {
+        _, err := agents.BuildAgent(&c)
+        if err != nil { return err }
+    }
+    return nil
 }
 
 func GenerateExampleConfig() *conf.SpoonConfig {

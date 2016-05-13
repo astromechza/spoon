@@ -31,8 +31,6 @@ deploy the daemon to my home servers.
     rather than throwing errors in multivalued agents, just log 'warn' for them.
 - add whitelist option to disk agent (whitelist specific disks to show)
 - add hostname to path or have it as an optional interpolated field in the main path name
-- config validation
-- add a -validate-config flag that exits after config validation
 - version number?
 
 ## Agents to add
