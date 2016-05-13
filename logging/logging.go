@@ -15,22 +15,16 @@ var logFormat = logging.MustStringFormatter(
     "%{time:2006-01-02T15:04:05.000} %{module} %{level:.4s} - %{message}",
 )
 
-// Initial sets up the initial logging configuration to stdout
-func Initial() {
-    logging.SetBackend(logging.NewBackendFormatter(logging.NewLogBackend(os.Stdout, "", 0), logFormat))
-    log.Debug("Set up basic stdout logger")
-}
-
 // TODO
 // would be cool to also add a stderr logger for ERROR and CRITICAL messages
 // so that they get seen in both the file and stream
 
-// Reconfigure the logging to follow the given logging configuration
-func Reconfigure(logcfg *conf.SpoonConfigLog, debug bool) {
+// Configure the logging to follow the given logging configuration
+func Configure(logcfg *conf.SpoonConfigLog, debug bool) {
     log.Debugf("Loaded logging configuration: %v", *logcfg)
 
     var logBackend logging.Backend
-    if logcfg.Path == "-" {
+    if logcfg.Path == "" || logcfg.Path == "-" {
         logBackend = logging.NewLogBackend(os.Stdout, "", 0)
     } else {
         log.Debugf("Logging configuration specified path: %s", logcfg.Path)

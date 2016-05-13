@@ -6,6 +6,7 @@ import (
     "encoding/json"
     "os"
     "os/signal"
+    "path/filepath"
 
     "github.com/op/go-logging"
 
@@ -83,6 +84,11 @@ func main() {
     // load the config file
     configPath := (*configFlag)
     if configPath == "" { configPath = "/etc/spoon.json" }
+    configPath, err := filepath.Abs(configPath)
+    if err != nil {
+        fmt.Printf("Failed to identify config path: %v\n", err.Error())
+        os.Exit(1)
+    }
 
     // quick validate the config if user asked
     if (*validateFlag) {
@@ -96,7 +102,7 @@ func main() {
     }
 
     // set up initial logging to stdout
-    slogging.Initial()
+    slogging.Configure(&conf.SpoonConfigLog{}, *debugFlag)
 
     // load config
     log.Infof("Loading config from %s", configPath)
@@ -108,7 +114,7 @@ func main() {
 
     // now that we have the config, we can reconfigure the logger according to
     // the config
-    slogging.Reconfigure(&cfg.Logging, *debugFlag)
+    slogging.Configure(&cfg.Logging, *debugFlag)
 
     // build sink
     activeSink := sink.NewLoggingSink()
