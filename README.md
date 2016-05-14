@@ -34,8 +34,6 @@ deploy the daemon to my home servers.
 - metric batching
     add PutMany to sink
     write batching logic for agents with many metrics so that we send a batch at a time
-- metrics added to carbon sink must only wait on the lock if the connection is known to be up
-    this helps when we have no connection at all, so that we dont get too many objects blocked by the lock
 
 ## Agents to add
 

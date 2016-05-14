@@ -34,6 +34,7 @@ type RobustCarbonSink struct {
 }
 
 const defaultConnTimeout = 5
+const connectionAttemptWait = 10
 
 func NewRobustCarbonSink(cfg *conf.SpoonConfigSink) (*RobustCarbonSink, error) {
 
@@ -69,7 +70,12 @@ func (s *RobustCarbonSink) Reconnect() error {
     // connect with timeout
     log.Infof("Attempting to connect graphite %v socket to %v with timeout %v", s.Protocol, address, s.ConnTimeout)
     conn, err := net.DialTimeout(s.Protocol, address, s.ConnTimeout)
-    if err != nil { return err }
+    if err != nil {
+        // sleep here since we could not connect
+        log.Errorf("Failed to connect, sleeping %v seconds until next attempt", connectionAttemptWait)
+        time.Sleep(time.Duration(connectionAttemptWait) * time.Second)
+        return err
+    }
 
     log.Info("Connection successful.")
     s.connection = conn
