@@ -5,6 +5,7 @@ import (
     "time"
     "math"
     "fmt"
+    "math/rand"
 
     "github.com/op/go-logging"
 
@@ -67,6 +68,11 @@ func SpawnAgent(agent interface{}, sink sink.Sink) error {
     go func(agent Agent) {
         conf := agent.GetConfig()
         log.Infof("Starting %s agent %s with interval %.2f seconds", conf.Type, conf.Path, conf.Interval)
+
+        // calculate random delay using half of the interval
+        delay := rand.Float64() * float64(conf.Interval) * 0.5
+        log.Infof("Delaying %s agent by %.2f seconds in order to spread the agents out and reduce spikes", conf.Type, delay)
+        time.Sleep(time.Duration(delay) * time.Second)
 
         intervalNanos := float64(conf.Interval) * float64(time.Second)
         spawnTime := time.Now().UnixNano()

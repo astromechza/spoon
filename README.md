@@ -28,9 +28,7 @@ deploy the daemon to my home servers.
 
 - **Add actual carbon packet sending**
 - improve agent error handling
-- add whitelist option to disk agent (whitelist specific disks to show)
 - add hostname to path or have it as an optional interpolated field in the main path name
-- add random delay to start of agents in order to spread them out
 
 ## Agents to add
 
