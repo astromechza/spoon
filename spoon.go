@@ -215,7 +215,7 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Interval: float32(60),
                 Path: "example.net",
                 Settings: map[string]interface{}{
-                    "nic_regex": "e(th|n)\\d",
+                    "nic_regex": "^e(th|n|m)\\d$",
                 },
                 Enabled: true,
             },

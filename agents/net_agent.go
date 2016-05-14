@@ -36,13 +36,14 @@ func (a *netAgent) Tick(sink sink.Sink) error {
     iocounters, err := net.IOCounters(true)
     if err != nil { return err }
 
-    nicre, ok := a.settings["nic_regex"]
-    if ok == false { nicre = ".*" }
+    nicre := a.settings["nic_regex"]
     for _, nicio := range iocounters {
-        m, _ := regexp.MatchString(nicre, nicio.Name)
-        if m == false {
-            log.Debugf("Skipping %v because it didn't match nic_regex", nicio.Name)
-            continue
+        if nicre != "" {
+            m, _ := regexp.MatchString(nicre, nicio.Name)
+            if m == false {
+                log.Debugf("Skipping %v because it didn't match nic_regex", nicio.Name)
+                continue
+            }
         }
         prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 

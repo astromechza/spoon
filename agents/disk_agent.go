@@ -3,6 +3,7 @@ package agents
 import (
     "fmt"
     "strings"
+    "regexp"
 
     "github.com/shirou/gopsutil/disk"
 
@@ -12,11 +13,21 @@ import (
 
 type diskAgent struct {
     config conf.SpoonConfigAgent
+    settings map[string]string
 }
 
 func NewDiskAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
+
+    settings := make(map[string]string, 0)
+    for k, v := range config.Settings {
+        vs, ok := v.(string)
+        if ok == false { return nil, fmt.Errorf("Error casting settings value %v to string", v) }
+        settings[k] = vs
+    }
+
     return &diskAgent{
         config: (*config),
+        settings: settings,
     }, nil
 }
 
@@ -26,12 +37,24 @@ func (a *diskAgent) GetConfig() conf.SpoonConfigAgent {
 
 func (a *diskAgent) Tick(sink sink.Sink) error {
 
+    devre := a.settings["device_regex"]
+
     // fetch all the physical disk partitions. the boolean indicates whether
     // non-physical partitions should be returned too.
     parts, err := disk.Partitions(false)
     if err == nil {
         // loop through all the partitions returned
         for _, p := range parts {
+
+            // check against regex if provided
+            if devre != "" {
+                m, _ := regexp.MatchString(devre, p.Device)
+                if m == false {
+                    log.Debugf("Skipping usage for %v because it didn't match device_regex", p.Device)
+                    continue
+                }
+            }
+
             usage, err := disk.Usage(p.Mountpoint)
             if err == nil {
                 prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
@@ -69,9 +92,19 @@ func (a *diskAgent) Tick(sink sink.Sink) error {
     iocounters, err := disk.IOCounters()
     if err == nil {
 
-        // TODO test this on linux
         for path, iostat := range iocounters {
-            prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(path))
+            deviceName := "/dev/" + path
+
+            // check against regex if provided
+            if devre != "" {
+                m, _ := regexp.MatchString(devre, deviceName)
+                if m == false {
+                    log.Debugf("Skipping iocounters for %v because it didn't match device_regex", deviceName)
+                    continue
+                }
+            }
+
+            prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(deviceName))
 
             err = sink.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
             if err != nil { return err }
