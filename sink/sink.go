@@ -1,9 +1,11 @@
 package sink
 
 import (
-    "sync"
+    "fmt"
 
     "github.com/op/go-logging"
+
+    "github.com/AstromechZA/spoon/conf"
 )
 
 var log = logging.MustGetLogger("spoon.sink")
@@ -14,22 +16,13 @@ type Sink interface {
     Put(path string, value float64) error
 }
 
-// LoggingSink is an implementation of sync which just logs data points to the
-// standard logging output.
-type LoggingSink struct {
-    Lock sync.Mutex
-}
+func BuildSink(cfg *conf.SpoonConfigSink) (interface{}, error) {
 
-// Put writes a path/value pair to the log
-func (s *LoggingSink) Put(path string, value float64) error {
-    s.Lock.Lock()
-    defer s.Lock.Unlock()
+    switch cfg.Type {
+    case "log":
+        return NewLoggingSink(), nil
+    default:
+        return nil, fmt.Errorf("Unrecognised sink type '%v'", cfg.Type)
+    }
 
-    log.Infof("Value for '%v' = %v", path, value)
-
-    return nil
-}
-
-func NewLoggingSink() LoggingSink {
-    return LoggingSink{Lock: sync.Mutex{}}
 }

@@ -20,10 +20,17 @@ type SpoonConfigLog struct {
     RotateSize int64 `json:"rotate_size"`
 }
 
+// SpoonConfigSink is a sub structure of SpoonConfig
+type SpoonConfigSink struct {
+    Type string `json:"type"`
+    Settings map[string]interface{} `json:"settings"`
+}
+
 // SpoonConfig is the definition of the json config structure
 type SpoonConfig struct {
     Logging SpoonConfigLog `json:"logging"`
     Agents []SpoonConfigAgent `json:"agents"`
+    Sink SpoonConfigSink `json:"sink"`
 }
 
 // Load the config information from the file on disk

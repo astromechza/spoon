@@ -26,16 +26,16 @@ func (a *memAgent) Tick(sink sink.Sink) error {
     vmemInfo, err := mem.VirtualMemory()
     if err != nil { return err }
 
-    err = sink.Put(fmt.Sprintf("%s.mem.total", a.config.Path), float64(vmemInfo.Total))
+    err = sink.Put(fmt.Sprintf("%s.total", a.config.Path), float64(vmemInfo.Total))
     if err != nil { return err }
 
-    err = sink.Put(fmt.Sprintf("%s.mem.used", a.config.Path), float64(vmemInfo.Used))
+    err = sink.Put(fmt.Sprintf("%s.used", a.config.Path), float64(vmemInfo.Used))
     if err != nil { return err }
 
-    err = sink.Put(fmt.Sprintf("%s.mem.used_percent", a.config.Path), float64(vmemInfo.UsedPercent))
+    err = sink.Put(fmt.Sprintf("%s.used_percent", a.config.Path), float64(vmemInfo.UsedPercent))
     if err != nil { return err }
 
-    err = sink.Put(fmt.Sprintf("%s.mem.available", a.config.Path), float64(vmemInfo.Available))
+    err = sink.Put(fmt.Sprintf("%s.available", a.config.Path), float64(vmemInfo.Available))
     if err != nil { return err }
 
     smemInfo, err := mem.SwapMemory()

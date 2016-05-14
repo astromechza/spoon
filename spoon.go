@@ -117,7 +117,11 @@ func main() {
     slogging.Configure(&cfg.Logging, *debugFlag)
 
     // build sink
-    activeSink := sink.NewLoggingSink()
+    activeSink, err := sink.BuildSink(&cfg.Sink)
+    if err != nil {
+        log.Errorf("Failed to setup metric sink: %v\n", err.Error())
+        os.Exit(1)
+    }
 
     // build the list of real agents
     agentList := make([]interface{}, len(cfg.Agents))
@@ -136,7 +140,7 @@ func main() {
 
     // now spawn each of the agents
     for _, a := range agentList {
-        err = agents.SpawnAgent(a, &activeSink)
+        err = agents.SpawnAgent(a, activeSink.(sink.Sink))
         if err != nil {
             log.Errorf("Failed to spawn agent %v: %v", a, err.Error())
             os.Exit(1)
@@ -185,6 +189,9 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 Interval: float32(60),
                 Path: "example.disk",
                 Enabled: true,
+                Settings: map[string]interface{}{
+                    "device_regex": "da\\d$|disk\\d$",
+                },
             },
             conf.SpoonConfigAgent{
                 Type: "mem",
@@ -232,6 +239,9 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                 },
                 Enabled: true,
             },
+        },
+        Sink: conf.SpoonConfigSink{
+            Type: "log",
         },
     }
 }

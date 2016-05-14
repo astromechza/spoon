@@ -28,11 +28,13 @@ deploy the daemon to my home servers.
 
 - **Add actual carbon packet sending**
 - improve agent error handling
-- add hostname to path or have it as an optional interpolated field in the main path name
+- add interpolation framework
+    paths can contain ${xyz} segments which will then replace that bit with a string from the
+    interpolation map. certain interpolation key-values can be populated automatically like
+    hostname otherwise they just come from the config file.
 
 ## Agents to add
 
-- load average?
 - docker cpu and mem stats? (just cos gopsutil library supports this)
 
 ## Why 'Spoon'?
