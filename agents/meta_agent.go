@@ -42,13 +42,14 @@ func (a *metaAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *metaAgent) Tick(sinkBatcher *sink.Batcher) error {
-    defer sinkBatcher.Flush()
+    sinkBatcher.Clear()
 
     err1 := a.doCPU(sinkBatcher)
     err2 := a.doMem(sinkBatcher)
     if err1 != nil { return err1 }
     if err2 != nil { return err2 }
-    return nil
+
+    return sinkBatcher.Flush()
 }
 
 func (a *metaAgent) doCPU(sinkBatcher *sink.Batcher) error {

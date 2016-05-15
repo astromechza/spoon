@@ -23,7 +23,7 @@ func (a *memAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *memAgent) Tick(sinkBatcher *sink.Batcher) error {
-    defer sinkBatcher.Flush()
+    sinkBatcher.Clear()
 
     vmemInfo, err := mem.VirtualMemory()
     if err != nil { return err }
@@ -52,5 +52,8 @@ func (a *memAgent) Tick(sinkBatcher *sink.Batcher) error {
     err = sinkBatcher.Put(fmt.Sprintf("%s.swap.used_percent", a.config.Path), float64(smemInfo.UsedPercent))
     if err != nil { return err }
 
-    return sinkBatcher.Put(fmt.Sprintf("%s.swap.free", a.config.Path), float64(smemInfo.Free))
+    err = sinkBatcher.Put(fmt.Sprintf("%s.swap.free", a.config.Path), float64(smemInfo.Free))
+    if err != nil { return err }
+
+    return sinkBatcher.Flush()
 }

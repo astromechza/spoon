@@ -3,7 +3,7 @@
 set -e
 
 # first build the version string
-VERSION=0.10
+VERSION=1.0
 
 # add the git commit id
 VERSION="$VERSION (commit $(git rev-parse --short HEAD))"

@@ -49,15 +49,13 @@ func (a *cmdAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
-    defer sinkBatcher.Flush()
+    sinkBatcher.Clear()
 
     out, err := exec.Command(a.cmd[0], a.cmd[1:]...).Output()
     if err != nil {
         log.Errorf("%v command failed %v: %s", a.cmd[0], err, err.(*exec.ExitError).Stderr)
         return err
     }
-
-    var putError error
 
     lines := strings.Split(string(out), "\n")
     for _, line := range lines {
@@ -73,12 +71,9 @@ func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
                 subpath = a.config.Path + subpath
             }
             err = sinkBatcher.Put(subpath, value)
-            if err != nil && putError != nil {
-                log.Errorf("Error while putting value for %v: %v", subpath, err.Error())
-                putError = err
-            }
+            if err != nil { return err }
         }
     }
 
-    return putError
+    return sinkBatcher.Flush()
 }

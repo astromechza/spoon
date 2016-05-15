@@ -36,7 +36,7 @@ func (a *diskAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
-    defer sinkBatcher.Flush()
+    sinkBatcher.Clear()
 
     devre := a.settings["device_regex"]
 
@@ -123,7 +123,7 @@ func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
     } else {
         log.Errorf("Fetching iocounters for system failed: %v", err.Error())
     }
-    return nil
+    return sinkBatcher.Flush()
 }
 
 func (a *diskAgent) formatDeviceName(device string) string {

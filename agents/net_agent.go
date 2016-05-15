@@ -32,7 +32,7 @@ func (a *netAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
-    defer sinkBatcher.Flush()
+    sinkBatcher.Clear()
 
     iocounters, err := net.IOCounters(true)
     if err != nil { return err }
@@ -67,5 +67,5 @@ func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
     // would be useful to track udp/tcp
     // conntrack stats?
 
-    return nil
+    return sinkBatcher.Flush()
 }

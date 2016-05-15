@@ -27,15 +27,6 @@ deploy the daemon to my home servers.
 ## TODO
 
 - improve agent error handling
-- add interpolation framework
-    paths can contain ${xyz} segments which will then replace that bit with a string from the
-    interpolation map. certain interpolation key-values can be populated automatically like
-    hostname otherwise they just come from the config file.
-
-- better path generation
-    - add a 'base_path' to the config. this will prefix all metric paths that start with
-        a '.' (a path starting with a '.' is a relative path)
-    - make sure we validate these path things
 
 ## Agents to add
 

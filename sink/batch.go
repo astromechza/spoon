@@ -52,7 +52,6 @@ func (s *Batcher) Flush() error {
     if s.currentSize == 0 { return nil }
     err := s.sink.PutBatch(s.Metrics[:s.currentSize])
     s.currentSize = 0
-    s.Metrics = make([]Metric, s.MaxSize + 1)
     return err
 }
 
@@ -68,4 +67,8 @@ func (s *Batcher) PutAndFlush(path string, value float64) error {
     s.Metrics[s.currentSize] = m
     s.currentSize++
     return s.Flush()
+}
+
+func (s * Batcher) Clear() {
+    s.currentSize = 0
 }
