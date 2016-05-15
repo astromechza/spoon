@@ -7,7 +7,7 @@ import (
     "github.com/shirou/gopsutil/net"
 
     "github.com/AstromechZA/spoon/conf"
-    sink_ "github.com/AstromechZA/spoon/sink"
+    "github.com/AstromechZA/spoon/sink"
 )
 
 type netAgent struct {
@@ -31,13 +31,11 @@ func (a *netAgent) GetConfig() conf.SpoonConfigAgent {
     return a.config
 }
 
-func (a *netAgent) Tick(sink sink_.Sink) error {
+func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
+    defer sinkBatcher.Flush()
 
     iocounters, err := net.IOCounters(true)
     if err != nil { return err }
-
-    batch := sink_.NewBatch(sink, 10)
-    defer batch.Flush()
 
     nicre := a.settings["nic_regex"]
     for _, nicio := range iocounters {
@@ -50,16 +48,16 @@ func (a *netAgent) Tick(sink sink_.Sink) error {
         }
         prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 
-        err = batch.Put(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
+        err = sinkBatcher.Put(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
         if err != nil { return err }
 
-        err = batch.Put(fmt.Sprintf("%s.bytes_recv", prefixPath), float64(nicio.BytesRecv))
+        err = sinkBatcher.Put(fmt.Sprintf("%s.bytes_recv", prefixPath), float64(nicio.BytesRecv))
         if err != nil { return err }
 
-        err = batch.Put(fmt.Sprintf("%s.packets_sent", prefixPath), float64(nicio.PacketsSent))
+        err = sinkBatcher.Put(fmt.Sprintf("%s.packets_sent", prefixPath), float64(nicio.PacketsSent))
         if err != nil { return err }
 
-        err = batch.Put(fmt.Sprintf("%s.packets_recv", prefixPath), float64(nicio.PacketsRecv))
+        err = sinkBatcher.Put(fmt.Sprintf("%s.packets_recv", prefixPath), float64(nicio.PacketsRecv))
         if err != nil { return err }
 
         // TODO do we need the error and dropped counts?

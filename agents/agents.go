@@ -10,7 +10,7 @@ import (
     "github.com/op/go-logging"
 
     "github.com/AstromechZA/spoon/conf"
-    "github.com/AstromechZA/spoon/sink"
+    sink_ "github.com/AstromechZA/spoon/sink"
 )
 
 var log = logging.MustGetLogger("spoon.agents")
@@ -22,7 +22,7 @@ type Agent interface {
     GetConfig() conf.SpoonConfigAgent
 
     // fetch a result for this agent
-    Tick(sink sink.Sink) error
+    Tick(sinkBatcher *sink_.Batcher) error
 }
 
 // BuildAgent will return a pointer to a constructed object that follows
@@ -54,7 +54,7 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
 
 // SpawnAgent will begin running the given agent in a loop based on the
 // interval for that agent.
-func SpawnAgent(agent interface{}, sink sink.Sink) error {
+func SpawnAgent(agent interface{}, sink sink_.Sink) error {
     agentO, ok := agent.(Agent)
     if ok != true {
         return fmt.Errorf("Failed to cast interface %v to Agent", agent)
@@ -74,6 +74,9 @@ func SpawnAgent(agent interface{}, sink sink.Sink) error {
         log.Infof("Delaying %s agent by %.2f seconds in order to spread the agents out and reduce spikes", conf.Type, delay)
         time.Sleep(time.Duration(delay) * time.Second)
 
+        // set up metric batch for agent
+        batcher := sink_.NewBatcher(sink)
+
         intervalNanos := float64(conf.Interval) * float64(time.Second)
         spawnTime := time.Now().UnixNano()
         var tickStart time.Time
@@ -81,7 +84,7 @@ func SpawnAgent(agent interface{}, sink sink.Sink) error {
         for {
             // do call to agent
             tickStart = time.Now()
-            err := agent.Tick(sink)
+            err := agent.Tick(batcher)
             tickElapsed = time.Since(tickStart)
             if err != nil {
                 log.Errorf("tick for agent %v returned an error after %v: %v", conf.Path, tickElapsed.String(), err.Error())

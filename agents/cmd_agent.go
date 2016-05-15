@@ -48,7 +48,8 @@ func (a *cmdAgent) GetConfig() conf.SpoonConfigAgent {
     return a.config
 }
 
-func (a *cmdAgent) Tick(sink sink.Sink) error {
+func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
+    defer sinkBatcher.Flush()
 
     out, err := exec.Command(a.cmd[0], a.cmd[1:]...).Output()
     if err != nil {
@@ -69,7 +70,7 @@ func (a *cmdAgent) Tick(sink sink.Sink) error {
                 log.Errorf("Path %v had value %v which was not a valid 64bit float", subpath, groups[2])
             }
             subpath = fmt.Sprintf("%s.%v", a.config.Path, subpath)
-            err = sink.Put(subpath, value)
+            err = sinkBatcher.Put(subpath, value)
             if err != nil && putError != nil {
                 log.Errorf("Error while putting value for %v: %v", subpath, err.Error())
                 putError = err

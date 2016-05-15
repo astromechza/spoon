@@ -8,7 +8,7 @@ import (
     "github.com/shirou/gopsutil/disk"
 
     "github.com/AstromechZA/spoon/conf"
-    sink_ "github.com/AstromechZA/spoon/sink"
+    "github.com/AstromechZA/spoon/sink"
 )
 
 type diskAgent struct {
@@ -35,10 +35,8 @@ func (a *diskAgent) GetConfig() conf.SpoonConfigAgent {
     return a.config
 }
 
-func (a *diskAgent) Tick(sink sink_.Sink) error {
-
-    batch := sink_.NewBatch(sink, 10)
-    defer batch.Flush()
+func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
+    defer sinkBatcher.Flush()
 
     devre := a.settings["device_regex"]
 
@@ -62,25 +60,25 @@ func (a *diskAgent) Tick(sink sink_.Sink) error {
             if err == nil {
                 prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
 
-                err = batch.Put(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.free", prefixPath), float64(usage.Free))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.free", prefixPath), float64(usage.Free))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.used", prefixPath), float64(usage.Used))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.used", prefixPath), float64(usage.Used))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.used_percent", prefixPath), float64(usage.UsedPercent))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.used_percent", prefixPath), float64(usage.UsedPercent))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.inode_free", prefixPath), float64(usage.InodesFree))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.inode_free", prefixPath), float64(usage.InodesFree))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.inode_used", prefixPath), float64(usage.InodesUsed))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.inode_used", prefixPath), float64(usage.InodesUsed))
                 if err != nil { return err }
 
-                err = batch.Put(fmt.Sprintf("%s.inode_used_percent", prefixPath), float64(usage.InodesUsedPercent))
+                err = sinkBatcher.Put(fmt.Sprintf("%s.inode_used_percent", prefixPath), float64(usage.InodesUsedPercent))
                 if err != nil { return err }
 
             } else {
@@ -109,16 +107,16 @@ func (a *diskAgent) Tick(sink sink_.Sink) error {
 
             prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(deviceName))
 
-            err = batch.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
+            err = sinkBatcher.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
             if err != nil { return err }
 
-            err = batch.Put(fmt.Sprintf("%s.write_count", prefixPath), float64(iostat.WriteCount))
+            err = sinkBatcher.Put(fmt.Sprintf("%s.write_count", prefixPath), float64(iostat.WriteCount))
             if err != nil { return err }
 
-            err = batch.Put(fmt.Sprintf("%s.read_bytes", prefixPath), float64(iostat.ReadBytes))
+            err = sinkBatcher.Put(fmt.Sprintf("%s.read_bytes", prefixPath), float64(iostat.ReadBytes))
             if err != nil { return err }
 
-            err = batch.Put(fmt.Sprintf("%s.write_bytes", prefixPath), float64(iostat.WriteBytes))
+            err = sinkBatcher.Put(fmt.Sprintf("%s.write_bytes", prefixPath), float64(iostat.WriteBytes))
             if err != nil { return err }
         }
 

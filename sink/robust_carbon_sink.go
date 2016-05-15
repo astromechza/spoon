@@ -94,51 +94,12 @@ func (s *RobustCarbonSink) Disconnect() error {
 
 func (s *RobustCarbonSink) Put(path string, value float64) error {
     // get the timestamp BEFORE we lock
-    timestamp := time.Now().Unix()
-
-    // now get lock
-    s.lock.Lock()
-    defer s.lock.Unlock()
-
-    // construct output buffer
-    buf := bytes.NewBufferString("")
-    buf.WriteString(fmt.Sprintf(
-        "%s %s %d\n",
-        path,
-        strconv.FormatFloat(value, 'f', -1, 64),
-        timestamp,
-    ))
-
-    // if no connection, try reconnect
-    if s.connection == nil {
-        err := s.Reconnect()
-        if err != nil { return err }
+    m := Metric{
+        Path: path,
+        Value: value,
+        Timestamp: time.Now().Unix(),
     }
-
-    // now try send the data
-    _, err := s.connection.Write(buf.Bytes())
-
-    // if err is not temporary, disconnect and we can try redo the connection
-    if err != nil {
-        netError, ok := err.(net.Error)
-        if ok {
-            if netError.Timeout() {
-                log.Errorf("Graphite connection timed out while sending")
-                return err
-            }
-            if netError.Temporary() {
-                log.Errorf("Graphite connection hit a temporary error")
-                return err
-            }
-
-        }
-
-        log.Errorf("Graphite connection hit a more permanent error")
-        s.Disconnect()
-        return err
-    }
-
-    return nil
+    return s.PutBatch([]Metric{m})
 }
 
 func (s *RobustCarbonSink) PutBatch(batch []Metric) error {

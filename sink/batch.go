@@ -12,10 +12,19 @@ type Batcher struct {
     sink Sink
 }
 
-func NewBatch(sink Sink, maxSize int) *Batcher {
+func NewBatcherOfSize(sink Sink, maxSize int) *Batcher {
     return &Batcher{
-        Metrics: make([]Metric, maxSize + 1),
+        Metrics: make([]Metric, maxSize),
         MaxSize: maxSize,
+        currentSize: 0,
+        sink: sink,
+    }
+}
+
+func NewBatcher(sink Sink) *Batcher {
+    return &Batcher{
+        Metrics: make([]Metric, 16),
+        MaxSize: 16,
         currentSize: 0,
         sink: sink,
     }
@@ -45,4 +54,18 @@ func (s *Batcher) Flush() error {
     s.currentSize = 0
     s.Metrics = make([]Metric, s.MaxSize + 1)
     return err
+}
+
+func (s *Batcher) PutAndFlush(path string, value float64) error {
+    // create metric object
+    m := Metric{
+        Path: path,
+        Value: value,
+        Timestamp: time.Now().Unix(),
+    }
+
+    // add it
+    s.Metrics[s.currentSize] = m
+    s.currentSize++
+    return s.Flush()
 }

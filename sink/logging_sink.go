@@ -32,7 +32,7 @@ func (s *LoggingSink) PutBatch(batch []Metric) error {
     s.lock.Lock()
     defer s.lock.Unlock()
 
-    output := fmt.Sprintf("Putting batch of %v metrics:", len(batch))
+    output := fmt.Sprintf("LoggingSink received batch of %v metrics:", len(batch))
     for _, m := range batch {
         output += fmt.Sprintf("\nValue for '%v' = %v", m.Path, m.Value)
     }
