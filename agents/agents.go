@@ -87,9 +87,9 @@ func SpawnAgent(agent interface{}, sink sink_.Sink) error {
             err := agent.Tick(batcher)
             tickElapsed = time.Since(tickStart)
             if err != nil {
-                log.Errorf("tick for agent %v returned an error after %v: %v", conf.Path, tickElapsed.String(), err.Error())
+                log.Errorf("Agent %v@%v returned an error after %v: %v", conf.Type, conf.Path, tickElapsed.String(), err.Error())
             } else {
-                log.Debugf("tick for agent %v returned after %v", conf.Path, tickElapsed.String())
+                log.Infof("Tick for agent %v@%v returned after %v", conf.Type, conf.Path, tickElapsed.String())
             }
 
             // now calculate time to sleep to meet the next tick time
