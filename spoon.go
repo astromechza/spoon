@@ -260,7 +260,7 @@ func GenerateExampleConfig() *conf.SpoonConfig {
                     "cmd": []string{
                         "python",
                         "-c",
-                        "import random; print 'test.path', random.randint(-100, 100)",
+                        "import random; print '.test.path', random.randint(-100, 100)",
                     },
                 },
                 Enabled: true,
