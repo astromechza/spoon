@@ -8,7 +8,7 @@ configure them.
 
 ### Common configuration
 
-```json
+```
 {
     "type": <the agent type string>,
     "path": <relative or absolute '.' separated path>,
@@ -31,6 +31,9 @@ may not be <= 0.
 The `enabled` parameter is pretty straightforward. If true, the agent will collect
 and report metrics.
 
+The `settings` parameter is only optionally needed for some agents. For all
+others it is ignored and can be left out.
+
 ## `cmd` Agent
 
 The `cmd` agent allows the user to write their own agents in the form of other
@@ -49,7 +52,7 @@ This line won't generate a value
 ```
 
 The `cmd` agent is the only agent allowed to post metrics with absolute path
-names.
+names without being influenced by the base path or agent path.
 
 ## `cpu` Agent
 
