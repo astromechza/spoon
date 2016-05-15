@@ -7,7 +7,7 @@ import (
     "github.com/shirou/gopsutil/cpu"
 
     "github.com/AstromechZA/spoon/conf"
-    "github.com/AstromechZA/spoon/sink"
+    sink_ "github.com/AstromechZA/spoon/sink"
 )
 
 type cpuAgent struct {
@@ -33,10 +33,13 @@ func (a *cpuAgent) GetConfig() conf.SpoonConfigAgent {
     return a.config
 }
 
-func (a *cpuAgent) Tick(sink sink.Sink) error {
+func (a *cpuAgent) Tick(sink sink_.Sink) error {
     now := time.Now()
     cpuTimesSet, err := cpu.Times(true)
     if err != nil { return err }
+
+    batch := sink_.NewBatch(sink, 10)
+    defer batch.Flush()
 
     var putError error
 
@@ -51,7 +54,7 @@ func (a *cpuAgent) Tick(sink sink.Sink) error {
         if a.hasPrevCPU && len(a.prevCPUTotals) > i {
             percent := a.calculateCPUPercent(a.prevCPUTotals[i], totals[i], a.prevCPUBusys[i], busys[i])
             subpath := fmt.Sprintf("%s.%v.cpu_percent", a.config.Path, i)
-            err = sink.Put(subpath, percent)
+            err = batch.Put(subpath, percent)
             if err != nil && putError != nil {
                 log.Errorf("Error while putting value for %v: %v", subpath, err.Error())
                 putError = err

@@ -2,6 +2,7 @@ package sink
 
 import (
     "sync"
+    "fmt"
 )
 
 // LoggingSink is an implementation of sync which just logs data points to the
@@ -23,6 +24,20 @@ func (s *LoggingSink) Put(path string, value float64) error {
     defer s.lock.Unlock()
 
     log.Infof("Value for '%v' = %v", path, value)
+
+    return nil
+}
+
+func (s *LoggingSink) PutBatch(batch []Metric) error {
+    s.lock.Lock()
+    defer s.lock.Unlock()
+
+    output := fmt.Sprintf("Putting batch of %v metrics:", len(batch))
+    for _, m := range batch {
+        output += fmt.Sprintf("\nValue for '%v' = %v", m.Path, m.Value)
+    }
+
+    log.Info(output)
 
     return nil
 }

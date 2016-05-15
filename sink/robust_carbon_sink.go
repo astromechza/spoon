@@ -140,3 +140,52 @@ func (s *RobustCarbonSink) Put(path string, value float64) error {
 
     return nil
 }
+
+func (s *RobustCarbonSink) PutBatch(batch []Metric) error {
+    s.lock.Lock()
+    defer s.lock.Unlock()
+
+    // construct output buffer
+    buf := bytes.NewBufferString("")
+
+    for _, m := range batch {
+        buf.WriteString(fmt.Sprintf(
+            "%s %s %d\n",
+            m.Path,
+            strconv.FormatFloat(m.Value, 'f', -1, 64),
+            m.Timestamp,
+        ))
+    }
+
+    // if no connection, try reconnect
+    if s.connection == nil {
+        err := s.Reconnect()
+        if err != nil { return err }
+    }
+
+    // now try send the data
+    _, err := s.connection.Write(buf.Bytes())
+
+    // if err is not temporary, disconnect and we can try redo the connection
+    if err != nil {
+        netError, ok := err.(net.Error)
+        if ok {
+            if netError.Timeout() {
+                log.Errorf("Graphite connection timed out while sending")
+                return err
+            }
+            if netError.Temporary() {
+                log.Errorf("Graphite connection hit a temporary error")
+                return err
+            }
+
+        }
+
+        log.Errorf("Graphite connection hit a more permanent error")
+        s.Disconnect()
+        return err
+    }
+
+    return nil
+
+}

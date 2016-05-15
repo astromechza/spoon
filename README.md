@@ -31,9 +31,7 @@ deploy the daemon to my home servers.
     paths can contain ${xyz} segments which will then replace that bit with a string from the
     interpolation map. certain interpolation key-values can be populated automatically like
     hostname otherwise they just come from the config file.
-- metric batching
-    add PutMany to sink
-    write batching logic for agents with many metrics so that we send a batch at a time
+- refactor single vs batch so that single is just a batch of 1
 
 ## Agents to add
 
