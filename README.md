@@ -80,6 +80,9 @@ or stop running unless something goes badly wrong (like someone kill -9's it).
 
 It will accept a SIGINT in order to stop gracefully.
 
+An example of the log output and metrics sent when run using the example config
+can be seen in [spoon.example.log](spoon.example.log).
+
 ## Agent Types
 
 - `time`: just returns the unix nanoseconds
