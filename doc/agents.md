@@ -77,12 +77,82 @@ For example on a 4 core machine this will generate:
 
 ## `disk` Agent
 
-The `disk` agent provides usage metrics about partitions and IO counter metrics
-about physical disks.
+The `disk` agent provides usage metrics about physical disk partitions and IO
+counter metrics about physical disks.
 
-TODO add more here
+For example you might get output like the following:
+
+```
+# usage metrics for physical partition /dev/sda1
+.dev_sda1.total -> bytes
+.dev_sda1.free -> bytes
+.dev_sda1.used -> bytes
+.dev_sda1.used_percent -> 0-100%
+.dev_sda1.inode_free -> count
+.dev_sda1.inode_used -> count
+.dev_sda1.inode_used_percent -> 0-100%
+
+# usage metrics for physical partition /dev/sdb1
+.dev_sdb1.total -> bytes
+.dev_sdb1.free -> bytes
+.dev_sdb1.used -> bytes
+.dev_sdb1.used_percent -> 0-100%
+.dev_sdb1.inode_free -> count
+.dev_sdb1.inode_used -> count
+.dev_sdb1.inode_used_percent -> 0-100%
+
+# io counters for disk /dev/sda
+.dev_sda.read_count -> count
+.dev_sda.write_count -> count
+.dev_sda.read_bytes -> bytes
+.dev_sda.write_bytes -> bytes
+
+# io counters for partition /dev/sda1
+.dev_sda1.read_count -> count
+.dev_sda1.write_count -> count
+.dev_sda1.read_bytes -> bytes
+.dev_sda1.write_bytes -> bytes
+
+# io counters for partition /dev/sda2
+.dev_sda2.read_count -> count
+.dev_sda2.write_count -> count
+.dev_sda2.read_bytes -> bytes
+.dev_sda2.write_bytes -> bytes
+
+# io counters for partition /dev/sda5
+.dev_sda5.read_count -> count
+.dev_sda5.write_count -> count
+.dev_sda5.read_bytes -> bytes
+.dev_sda5.write_bytes -> bytes
+
+# io counters for disk /dev/sdb
+.dev_sdb.read_count -> count
+.dev_sdb.write_count -> count
+.dev_sdb.read_bytes -> bytes
+.dev_sdb.write_bytes -> bytes
+
+# io counters for partition /dev/sdb1
+.dev_sdb1.read_count -> count
+.dev_sdb1.write_count -> count
+.dev_sdb1.read_bytes -> bytes
+.dev_sdb1.write_bytes -> bytes
+```
+
+If you don't want to report on all devices and partitions, then add a regular
+expression in the `"settings"` parameter as follows:
+
+```
+
+"settings": {
+    "device_regex": "sda[12]"
+}
+
+```
 
 ## `mem` Agent
+
+The `mem` agent reports memory usage information for the whole system. We report
+high level metrics for normal ram and swap.
 
 ```
 .total -> bytes
@@ -96,8 +166,6 @@ TODO add more here
 .swap.free -> bytes
 ```
 
-TODO add more here
-
 ## `meta` Agent
 
 The `meta` agent reports the share of cpu that the Spoon process is using as well
@@ -110,14 +178,28 @@ as the RSS (resident set size) of memory allocated to it.
 
 ## `net` Agent
 
-```
-em1.bytes_sent -> bytes
-em1.bytes_recv -> bytes
-em1.packets_sent -> bytes
-em1.packets_recv -> bytes
+The `net` agent reports bytes and packets send and received by each network
+interface.
+
+If you don't want to report on all interfaces, then add a regular expression in
+the `"settings"` parameter as follows:
+
 ```
 
-TODO add more here
+"settings": {
+    "nic_regex": "eth0|eth1"
+}
+
+```
+
+This will generate something like:
+
+```
+.eth0.bytes_sent -> bytes
+.eth0.bytes_recv -> bytes
+.eth0.packets_sent -> bytes
+.eth0.packets_recv -> bytes
+```
 
 ## `time` Agent
 
