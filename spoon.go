@@ -24,10 +24,10 @@ daemon, it runs a configurable number of gathering agents and forwards the
 results to a Carbon Aggregator or Cache.
 
 By default, it looks for a config file at /etc/spoon.json but this path can be
-specified at the command line.
+specified at the command line using '-config'.
 
 Spoon does not require root permissions to run, but might need them depending on
-what agents are configured.
+which agents are configured.
 
 `
 
@@ -58,6 +58,8 @@ func main() {
     // first do arg checking
     if (*versionFlag) {
         fmt.Println("Spoon Version " + SpoonVersion)
+        fmt.Println(constants.SpoonImage)
+        fmt.Println("Project: https://github.com/AstromechZA/spoon")
         os.Exit(0)
     }
 

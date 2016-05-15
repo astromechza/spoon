@@ -27,3 +27,12 @@ const ValidAgentPathRegexStrict = "^" + ValidAgentPathRegex + "$"
 // ValidBasePathRegexStrict is ValidBasePathRegex with string bounderies on
 // either side
 const ValidBasePathRegexStrict = "^" + ValidBasePathRegex + "$"
+
+// SpoonImage is just an ascii spoon image for fun
+const SpoonImage =
+`
+    __________        .-"""-.
+   /          ''''---' .'    \
+   \__________....---. '.    /
+                      '-...-'
+`
