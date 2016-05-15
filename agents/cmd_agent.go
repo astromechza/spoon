@@ -6,10 +6,10 @@ import (
     "strings"
     "regexp"
     "strconv"
-    "fmt"
 
     "github.com/AstromechZA/spoon/conf"
     "github.com/AstromechZA/spoon/sink"
+    "github.com/AstromechZA/spoon/constants"
 )
 
 type cmdAgent struct {
@@ -40,7 +40,7 @@ func NewCMDAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
     return &cmdAgent{
         config: *config,
         cmd: cmdStringItems,
-        lineRegexp: *regexp.MustCompile("^([a-zA-Z0-9\\-\\_]+?(?:\\.[a-zA-Z0-9\\-\\_]+)*)\\s+([\\-0-9\\.]+)\\s*$"),
+        lineRegexp: *regexp.MustCompile("^(" + constants.ValidAgentPathRegex + ")*\\s+([\\-0-9\\.]+)\\s*$"),
     }, nil
 }
 
@@ -69,7 +69,9 @@ func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
             if err != nil {
                 log.Errorf("Path %v had value %v which was not a valid 64bit float", subpath, groups[2])
             }
-            subpath = fmt.Sprintf("%s.%v", a.config.Path, subpath)
+            if subpath[0] == '.' {
+                subpath = a.config.Path + subpath
+            }
             err = sinkBatcher.Put(subpath, value)
             if err != nil && putError != nil {
                 log.Errorf("Error while putting value for %v: %v", subpath, err.Error())

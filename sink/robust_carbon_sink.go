@@ -147,6 +147,6 @@ func (s *RobustCarbonSink) PutBatch(batch []Metric) error {
         return err
     }
 
+    log.Debugf("RobustCarbonSink sent batch of %v metrics", len(batch))
     return nil
-
 }

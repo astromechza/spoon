@@ -28,6 +28,7 @@ type SpoonConfigSink struct {
 
 // SpoonConfig is the definition of the json config structure
 type SpoonConfig struct {
+    BasePath string `json:"base_path"`
     Logging SpoonConfigLog `json:"logging"`
     Agents []SpoonConfigAgent `json:"agents"`
     Sink SpoonConfigSink `json:"sink"`

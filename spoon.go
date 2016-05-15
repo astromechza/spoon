@@ -7,12 +7,14 @@ import (
     "os"
     "os/signal"
     "path/filepath"
+    "regexp"
 
     "github.com/op/go-logging"
 
     "github.com/AstromechZA/spoon/conf"
     "github.com/AstromechZA/spoon/agents"
     "github.com/AstromechZA/spoon/sink"
+    "github.com/AstromechZA/spoon/constants"
     slogging "github.com/AstromechZA/spoon/logging"
 )
 
@@ -90,14 +92,15 @@ func main() {
         os.Exit(1)
     }
 
-    // quick validate the config if user asked
+    // quick validate the config
+    err = LoadAndValidateConfig(configPath)
+    if err != nil {
+        fmt.Printf("Config failed validation: %v\n", err.Error())
+        os.Exit(1)
+    }
+
     if (*validateFlag) {
-        err := LoadAndValidateConfig(configPath)
-        if err != nil {
-            fmt.Printf("Config failed validation: %v\n", err.Error())
-            os.Exit(1)
-        }
-        fmt.Printf("No problems found in %v config. Looks good to me!\n", configPath)
+        fmt.Printf("No problems found in config from %s. Looks good to me!\n", configPath)
         os.Exit(0)
     }
 
@@ -126,6 +129,11 @@ func main() {
     // build the list of real agents
     agentList := make([]interface{}, len(cfg.Agents))
     for i, c := range cfg.Agents {
+
+        if len(c.Path) > 0 && c.Path[0] == '.' {
+            c.Path = cfg.BasePath + c.Path
+        }
+
         agent, err := agents.BuildAgent(&c)
         if err != nil {
             os.Exit(1)
@@ -161,12 +169,34 @@ func LoadAndValidateConfig(path string) error {
     cfg, err := conf.Load(&path)
     if err != nil { return err }
 
-    // check logging config
+    // check base path
+    if cfg.BasePath != "" {
+        m, err := regexp.MatchString(constants.ValidBasePathRegexStrict, cfg.BasePath)
+        if err != nil { return err }
+        if m == false { return fmt.Errorf("Base path %s does not match required format", cfg.BasePath) }
+    }
 
     // check Sink config
+    _, err = sink.BuildSink(&cfg.Sink)
+    if err != nil { return err }
 
     for _, c := range cfg.Agents {
-        _, err := agents.BuildAgent(&c)
+
+        // validate agent path
+        m, err := regexp.MatchString(constants.ValidAgentPathRegexStrict, c.Path)
+        if err != nil { return err }
+        if m == false { return fmt.Errorf("%s agent path %s does not match required format", c.Type, c.Path) }
+
+        if len(c.Path) > 0 && c.Path[0] == '.' {
+
+            if cfg.BasePath == "" {
+                return fmt.Errorf("%s agent path %s is relative, but no base path was specified in config", c.Type, c.Path)
+            }
+
+            c.Path = cfg.BasePath + c.Path
+        }
+
+        _, err = agents.BuildAgent(&c)
         if err != nil { return err }
     }
     return nil
@@ -177,17 +207,18 @@ func GenerateExampleConfig() *conf.SpoonConfig {
         Logging: conf.SpoonConfigLog{
             Path: "-",
         },
+        BasePath: "example",
         Agents: []conf.SpoonConfigAgent{
             conf.SpoonConfigAgent{
                 Type: "cpu",
                 Interval: float32(60),
-                Path: "example.cpu",
+                Path: ".cpu",
                 Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "disk",
                 Interval: float32(60),
-                Path: "example.disk",
+                Path: ".disk",
                 Enabled: true,
                 Settings: map[string]interface{}{
                     "device_regex": "da\\d$|disk\\d$",
@@ -196,31 +227,31 @@ func GenerateExampleConfig() *conf.SpoonConfig {
             conf.SpoonConfigAgent{
                 Type: "mem",
                 Interval: float32(60),
-                Path: "example.mem",
+                Path: ".mem",
                 Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "meta",
                 Interval: float32(30),
-                Path: "example.spoon",
+                Path: ".spoon_process",
                 Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "time",
                 Interval: float32(10),
-                Path: "example.time",
+                Path: ".time",
                 Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "uptime",
                 Interval: float32(60),
-                Path: "example.uptime",
+                Path: ".uptime",
                 Enabled: true,
             },
             conf.SpoonConfigAgent{
                 Type: "net",
                 Interval: float32(60),
-                Path: "example.net",
+                Path: ".net",
                 Settings: map[string]interface{}{
                     "nic_regex": "^e(th|n|m)\\d$",
                 },
@@ -229,7 +260,7 @@ func GenerateExampleConfig() *conf.SpoonConfig {
             conf.SpoonConfigAgent{
                 Type: "cmd",
                 Interval: float32(30),
-                Path: "example.cmd",
+                Path: ".cmd",
                 Settings: map[string]interface{}{
                     "cmd": []string{
                         "python",
