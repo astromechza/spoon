@@ -12,17 +12,6 @@ import (
     "github.com/AstromechZA/spoon/conf"
 )
 
-/* Robust graphite sink for metrics
-
-when Put is called, it attempts to send a metric, if the metric fails to send
-if checks the connection, if the connection is broken, it attempts to reconnect
-if the reconnection fails, it returns an error and the metric is not sent
-if the reconnection succeeds, it sends the metric.
-
-alot of inspiration taken from github.com/marpaia/graphite-golang
-
-*/
-
 type RobustCarbonSink struct {
     Host string
     Port int

@@ -12,6 +12,19 @@ compile and run on Windows too, but results may vary.
 My aim in writing this software is to learn a bit more about Golang, and also
 deploy the daemon to my home servers.
 
+## Why should I use this?
+
+- single binary with no dependencies
+- simply and straighforward to use with minimal configuration
+- pretty reliable
+- lightweight
+- very easy to deploy
+
+## Why shouldn't I use this?
+
+- hasn't stood the test of time
+- it's called Spoon
+
 ## Usage
 
 ```
@@ -68,6 +81,31 @@ Run the `make_official.sh` script to build binaries for:
 
 All binaries are statically compiled and do not have any dependencies on the
 host.
+
+## How it works
+
+Each agent is spawned as its own goroutine. The goroutine has a while loop
+containing a sleep call in order to schedule each metrics call. The sleep time
+is adjusted to keep the call rate constant at once every Agent.Interval seconds.
+
+The start time of each agents is randomly delayed by up to half of its interval.
+This delay helps to reduce spikey load since most agents will run on a multiple
+of 10, 30, or 60 seconds.
+
+Reporting metrics to Carbon are done in batches. One batch of metrics per Agent
+call. The connection to Carbon will attempt to reconnect every 10 seconds if the
+connection is unsuccessful, and this connection is shared amongst all agents.
+
+Run Spoon with `-debug` mode on to have more insight into when metrics are
+reported and how big each batch is, as well as how long each Agent is taking to
+gather its metrics.
+
+## Memory and CPU footprint
+
+These kind of things are subjective depending on the number of agents you have
+configured and the frequency of their runs. So far, by the values returned by
+the `meta` agent, I've seen cpu usage around 0.03% and memory usage under 8 MB
+after running for 24 hours with the example config. So its super lightweight :).
 
 ## Why 'Spoon'?
 

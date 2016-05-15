@@ -1,5 +1,8 @@
 package constants
 
+
+
+
 // ValidPathPartRegex is the format of a part of a metric path
 const ValidPathPartRegex = "[a-zA-Z0-9\\-\\_]+"
 
