@@ -13,7 +13,7 @@ To configure a sink, add the top-level `"sink"` section to your config file.
 
 ## Log sink
 
-Configure a rotating log file:
+Print metrics to the log:
 
 ```
 "sink": {
@@ -23,7 +23,7 @@ Configure a rotating log file:
 
 ## Carbon sink
 
-Pretty self-explanatory:
+Send metrics to a carbon instance:
 
 ```
 "sink": {

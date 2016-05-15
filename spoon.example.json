@@ -1,0 +1,79 @@
+{
+    "base_path": "example",
+    "logging": {
+        "path": "-",
+        "rotate_size": 0
+    },
+    "agents": [
+        {
+            "enabled": true,
+            "type": "cpu",
+            "interval": 60,
+            "path": ".cpu",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "disk",
+            "interval": 60,
+            "path": ".disk",
+            "settings": {
+                "device_regex": "da\\d$|disk\\d$"
+            }
+        },
+        {
+            "enabled": true,
+            "type": "mem",
+            "interval": 60,
+            "path": ".mem",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "meta",
+            "interval": 30,
+            "path": ".spoon_process",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "time",
+            "interval": 10,
+            "path": ".time",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "uptime",
+            "interval": 60,
+            "path": ".uptime",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "net",
+            "interval": 60,
+            "path": ".net",
+            "settings": {
+                "nic_regex": "^e(th|n|m)\\d$"
+            }
+        },
+        {
+            "enabled": true,
+            "type": "cmd",
+            "interval": 30,
+            "path": ".cmd",
+            "settings": {
+                "cmd": [
+                    "python",
+                    "-c",
+                    "import random; print '.test.path', random.randint(-100, 100)"
+                ]
+            }
+        }
+    ],
+    "sink": {
+        "type": "log",
+        "settings": null
+    }
+}

@@ -55,6 +55,31 @@ The example configuration produced by `-generate` will have all agents enabled
 with some sane defaults and will send metrics to the log while logging to stdout.
 It should pass the validation provided by `-validate`.
 
+## Configuration
+
+Spoon is configured via a json file passed into it via the `-config` option or
+read from `/etc/spoon.json`. This single file configures the logging, agents,
+metrics destination, and paths. The example config, `spoon.example.json`, was
+generated via the `-generate` option.
+
+See [doc/sinks.md](doc/sinks.md) for information on configuring the metrics sink
+or destination.
+
+See [doc/logging.md](doc/logging.md) for information on configuring the logging.
+
+See [doc/sinks.md](doc/sink.md) for information on configuring the sink for metrics.
+
+## Running in production
+
+Spoon is not designed to fork itself and make sure it is always running, it
+should be controlled by something like supervisord, systemd, or even just an
+rc-local script to launch it at boot time.
+
+Once the agents have been spawned (after config validation) it should not crash
+or stop running unless something goes badly wrong (like someone kill -9's it).
+
+It will accept a SIGINT in order to stop gracefully.
+
 ## Agent Types
 
 - `time`: just returns the unix nanoseconds

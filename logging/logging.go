@@ -4,6 +4,7 @@ import (
     "os"
     "sync"
     "time"
+    "math"
 
     "github.com/op/go-logging"
 
@@ -27,6 +28,12 @@ func Configure(logcfg *conf.SpoonConfigLog, debug bool) {
     if logcfg.Path == "" || logcfg.Path == "-" {
         logBackend = logging.NewLogBackend(os.Stdout, "", 0)
     } else {
+
+        if logcfg.RotateSize <= 0 {
+            log.Infof("Configured rotate_size is 0. Log file will not be rotated.")
+            logcfg.RotateSize = math.MaxInt64
+        }
+
         log.Debugf("Logging configuration specified path: %s", logcfg.Path)
         rotatingWriter, err := NewRotatingWriter(logcfg.Path, logcfg.RotateSize)
         if err == nil {
