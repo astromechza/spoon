@@ -51,6 +51,13 @@ this.line.will -123.125125
 This line won't generate a value
 ```
 
+Will generate
+
+```
+this.line.will -> -123.125125
+.relative.path.example -> 0
+```
+
 The `cmd` agent is the only agent allowed to post metrics with absolute path
 names without being influenced by the base path or agent path.
 
@@ -77,6 +84,18 @@ TODO add more here
 
 ## `mem` Agent
 
+```
+.total -> bytes
+.used ->  bytes
+.used_percent ->  0-100%
+.available ->  bytes
+
+.swap.total -> bytes
+.swap.used -> bytes
+.swap.used_percent -> 0-100%
+.swap.free -> bytes
+```
+
 TODO add more here
 
 ## `meta` Agent
@@ -84,7 +103,19 @@ TODO add more here
 The `meta` agent reports the share of cpu that the Spoon process is using as well
 as the RSS (resident set size) of memory allocated to it.
 
+```
+.cpu_percent -> 0-100%
+.rss -> bytes
+```
+
 ## `net` Agent
+
+```
+em1.bytes_sent -> bytes
+em1.bytes_recv -> bytes
+em1.packets_sent -> bytes
+em1.packets_recv -> bytes
+```
 
 TODO add more here
 
@@ -94,6 +125,14 @@ The `time` agent can be used as a testing metric, or when collected between
 a large range of machines, can help to reveal NTP issues. It simply returns the
 current unix time as number of nanoseconds since January 1, 1970 UTC.
 
+```
+. -> nanoseconds
+```
+
 ## `uptime` Agent
 
 The `uptime` agent reports the uptime of the machine in seconds.
+
+```
+. -> seconds
+```
