@@ -141,11 +141,6 @@ func main() {
         agentList[i] = agent
     }
 
-    hn, err := os.Hostname()
-    if err == nil {
-        log.Infof("Hostname: %v", hn)
-    }
-
     // now spawn each of the agents
     for _, a := range agentList {
         err = agents.SpawnAgent(a, activeSink.(sink.Sink))
