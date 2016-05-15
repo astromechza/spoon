@@ -12,6 +12,11 @@ compile and run on Windows too, but results may vary.
 My aim in writing this software is to learn a bit more about Golang, and also
 deploy the daemon to my home servers.
 
+If you don't know about the Graphite project, Carbon, and interfaces like
+Grafana, check out: [graphite.readthedocs.io](http://graphite.readthedocs.io/en/latest/)
+and [grafana.org](http://grafana.org/).
+
+
 ## Why should I use this?
 
 - single binary with no dependencies
