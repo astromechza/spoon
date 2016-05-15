@@ -191,6 +191,10 @@ func LoadAndValidateConfig(path string) error {
             c.Path = cfg.BasePath + c.Path
         }
 
+        if c.Interval <= 0 {
+            return fmt.Errorf("%s agent interval cannot be <= 0")
+        }
+
         _, err = agents.BuildAgent(&c)
         if err != nil { return err }
     }

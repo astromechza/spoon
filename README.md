@@ -14,19 +14,16 @@ deploy the daemon to my home servers.
 
 ## Agent Types
 
-- 'time': just returns the unix nanoseconds
-- 'meta': returns the cpu percent and RSS usage of the Spoon process.
-- 'cpu': returns cpu percentage per core
-- 'disk': returns disk usage and io counters if available per physical partition and disk
-- 'mem': returns system memory and swap usage
-- 'uptime': just returns the machines uptime value
-- 'net': returns sent/recv info for interfaces
-- 'cmd': allows user to run their own command
-- ...
+- `time`: just returns the unix nanoseconds
+- `meta`: returns the cpu percent and RSS usage of the Spoon process.
+- `cpu`: returns cpu percentage per core
+- `disk`: returns disk usage and io counters if available per physical partition and disk
+- `mem`: returns system memory and swap usage
+- `uptime`: just returns the machines uptime value
+- `net`: returns sent/recv info for interfaces
+- `cmd`: allows user to run their own command
 
-## TODO
-
-- improve agent error handling
+More detail available on the [agents documentation](doc/agents.md).
 
 ## Agents to add
 
