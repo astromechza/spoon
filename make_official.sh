@@ -3,7 +3,7 @@
 set -e
 
 # first build the version string
-VERSION=1.0
+VERSION=1.1
 
 # add the git commit id and date
 VERSION="$VERSION (commit $(git rev-parse --short HEAD) @ $(git log -1 --date=short --pretty=format:%cd))"
