@@ -142,11 +142,9 @@ If you don't want to report on all devices and partitions, then add a regular
 expression in the `"settings"` parameter as follows:
 
 ```
-
 "settings": {
     "device_regex": "sda[12]"
 }
-
 ```
 
 ## `mem` Agent
@@ -185,11 +183,9 @@ If you don't want to report on all interfaces, then add a regular expression in
 the `"settings"` parameter as follows:
 
 ```
-
 "settings": {
     "nic_regex": "eth0|eth1"
 }
-
 ```
 
 This will generate something like:
