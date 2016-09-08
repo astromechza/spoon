@@ -209,24 +209,6 @@ This will generate something like:
 .eth0.packets_recv -> bytes
 ```
 
-## `time` Agent
-
-The `time` agent can be used as a testing metric, or when collected between
-a large range of machines, can help to reveal NTP issues. It simply returns the
-current unix time as number of nanoseconds since January 1, 1970 UTC.
-
-```
-. -> nanoseconds
-```
-
-## `uptime` Agent
-
-The `uptime` agent reports the uptime of the machine in seconds.
-
-```
-. -> seconds
-```
-
 ## `random` Agent
 
 The `random` agent generated random floating point numbers between the min
@@ -243,4 +225,47 @@ useful for testing your metric aggregation systems.
 
 ```
 . -> float
+```
+
+## `time` Agent
+
+The `time` agent can be used as a testing metric, or when collected between
+a large range of machines, can help to reveal NTP issues. It simply returns the
+current unix time as number of nanoseconds since January 1, 1970 UTC.
+
+```
+. -> nanoseconds
+```
+
+## `timed` Agent
+
+The `timed` agent is a variation on the `cmd` agent above which simply logs the
+time taken for the command to be run. This can often be very useful when you
+want to measure simpler things without writing logic for it. A useful example
+is a `ping` check or anything to do a quick speed test.
+
+The `ignore_error` setting has been added which when set will submit a value
+even if the command fails.
+
+```
+"settings": {
+    "cmd": [
+        "python",
+        "-c",
+        "import random; print '.test.path', random.randint(-100, 100)"
+    ],
+    "ignore_error": false
+}
+```
+
+```
+. -> elapsed seconds
+```
+
+## `uptime` Agent
+
+The `uptime` agent reports the uptime of the machine in seconds.
+
+```
+. -> seconds
 ```
