@@ -40,6 +40,18 @@ The `cmd` agent allows the user to write their own agents in the form of other
 scripts and binaries that can be called on the machine. This makes up for the
 fact that we cant load client collectors like Diamond does.
 
+The `settings` for a cmd agent should specify the cmd string array to execute:
+
+```
+"settings": {
+    "cmd": [
+        "python",
+        "-c",
+        "import random; print '.test.path', random.randint(-100, 100)"
+    ]
+}
+```
+
 For each line in the stdout that contains a relative or absolute metric path
 followed by a numeric value, a metric will be generated.
 
