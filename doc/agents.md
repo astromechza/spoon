@@ -214,3 +214,21 @@ The `uptime` agent reports the uptime of the machine in seconds.
 ```
 . -> seconds
 ```
+
+## `random` Agent
+
+The `random` agent generated random floating point numbers between the min
+and max that you specify. By default between 0 and 100. This agent is very
+useful for testing your metric aggregation systems.
+
+```
+"settings": {
+    "min": 0,
+    "max": 100
+}
+```
+
+
+```
+. -> float
+```

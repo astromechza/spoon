@@ -1,9 +1,8 @@
 # Spoon Readme
 
-Spoon is my implementation of a stats daemon
-in Go which sends its stats to a Carbon-cache or Carbon-aggregator. It aims to
-closely follow how python-diamond works, but quite a bit simpler and easier to
-configure.
+Spoon is my implementation of a stats daemon in Go which sends its stats to a
+Carbon-cache or Carbon-aggregator. It aims to closely follow how python-diamond
+works, but quite a bit simpler and easier to configure.
 
 Because it's written in Go, it will be deployable as a single binary and all of
 the agents should support Linux and OSX well. It will probably be able to
@@ -72,12 +71,12 @@ or destination.
 
 See [doc/logging.md](doc/logging.md) for information on configuring the logging.
 
-See [doc/sinks.md](doc/sink.md) for information on configuring the sink for metrics.
+See [doc/sinks.md](doc/agents.md) for information on the agents provided.
 
 ## Running in production
 
 Spoon is not designed to fork itself and make sure it is always running, it
-should be controlled by something like supervisord, systemd, or even just an
+should be controlled by something like `supervisord`, `systemd`, or even just an
 rc-local script to launch it at boot time.
 
 Once the agents have been spawned (after config validation) it should not crash
