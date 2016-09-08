@@ -71,7 +71,7 @@ or destination.
 
 See [doc/logging.md](doc/logging.md) for information on configuring the logging.
 
-See [doc/sinks.md](doc/agents.md) for information on the agents provided.
+See [doc/agents.md](doc/agents.md) for information on the agents provided.
 
 ## Running in production
 
