@@ -80,9 +80,6 @@ or stop running unless something goes badly wrong (like someone kill -9's it).
 
 It will accept a SIGINT in order to stop gracefully.
 
-An example of the log output and metrics sent when run using the example config
-can be seen in [spoon.example.log](spoon.example.log).
-
 ## Agent Types
 
 - `time`: just returns the unix nanoseconds
@@ -124,10 +121,6 @@ Reporting metrics to Carbon are done in batches. One batch of metrics per Agent
 call. The connection to Carbon will attempt to reconnect every 10 seconds if the
 connection is unsuccessful, and this connection is shared amongst all agents.
 
-Run Spoon with `-debug` mode on to have more insight into when metrics are
-reported and how big each batch is, as well as how long each Agent is taking to
-gather its metrics.
-
 ## Memory and CPU footprint
 
 These kind of things are subjective depending on the number of agents you have
@@ -145,3 +138,8 @@ It 'feeds' metrics to Graphite?
 $ dep ensure
 $ ./make_official
 ```
+
+## TODO
+
+- Switch everything to a Statsd style interface (counter, gauge, etc..). This would better support a Statsd sink
+backend or Prometheus backend.
