@@ -79,6 +79,8 @@ func main() {
 		os.Exit(0)
 	}
 
+	log.SetFlags(log.LUTC | log.Ldate | log.Ltime | log.Lshortfile)
+
 	// load the config file
 	configPath := (*configFlag)
 	if configPath == "" {

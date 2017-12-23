@@ -117,11 +117,11 @@ func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
 			if devre != "" {
 				m, _ := regexp.MatchString(devre, deviceName)
 				if m == false {
-					log.Printf("Skipping iocounters for %v because it didn't match device_regex", deviceName)
 					continue
 				}
 			}
 
+			log.Printf("Outputting metrics for %v because it matched device_regex", deviceName)
 			prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(deviceName))
 
 			err = sinkBatcher.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))

@@ -47,10 +47,10 @@ func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
 		if nicre != "" {
 			m, _ := regexp.MatchString(nicre, nicio.Name)
 			if m == false {
-				log.Printf("Skipping %v because it didn't match nic_regex", nicio.Name)
 				continue
 			}
 		}
+		log.Printf("Outputting metrics for %v because it matched nic_regex", nicio.Name)
 		prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 
 		err = sinkBatcher.Put(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
