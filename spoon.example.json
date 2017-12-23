@@ -1,9 +1,5 @@
 {
     "base_path": "example",
-    "logging": {
-        "path": "-",
-        "rotate_size": 0
-    },
     "agents": [
         {
             "enabled": true,

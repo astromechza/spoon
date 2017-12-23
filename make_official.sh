@@ -3,7 +3,7 @@
 set -e
 
 # first build the version string
-VERSION=1.3
+VERSION=1.4
 
 # add the git commit id and date
 VERSION="$VERSION (commit $(git rev-parse --short HEAD) @ $(git log -1 --date=short --pretty=format:%cd))"
@@ -21,7 +21,7 @@ function buildbinary {
     export GOOS=$goos
     export GOARCH=$goarch
 
-    go build -i -v -o "$outputfolder/spoon" -ldflags "-X \"main.SpoonVersion=$VERSION\"" github.com/AstromechZA/spoon
+    go build -i -v -o "$outputfolder/spoon" -ldflags "-X \"main.SpoonVersion=$VERSION\""
 
     echo "Done"
     ls -l "$outputfolder/spoon"
@@ -34,3 +34,6 @@ buildbinary darwin amd64
 
 # build for linux
 buildbinary linux amd64
+
+# and build for dev
+go build

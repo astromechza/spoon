@@ -138,3 +138,10 @@ after running for 24 hours with the example config. So its super lightweight :).
 ## Why 'Spoon'?
 
 It 'feeds' metrics to Graphite?
+
+## Building it
+
+```
+$ dep ensure
+$ ./make_official
+```
