@@ -127,8 +127,8 @@ func main() {
 			c.Path = cfg.BasePath + c.Path
 		}
 
-		agent, err := agents.BuildAgent(&c)
-		if err != nil {
+		agent, aerr := agents.BuildAgent(&c)
+		if aerr != nil {
 			os.Exit(1)
 		}
 		agentList[i] = agent
@@ -161,11 +161,11 @@ func LoadAndValidateConfig(path string) error {
 
 	// check base path
 	if cfg.BasePath != "" {
-		m, err := regexp.MatchString(constants.ValidBasePathRegexStrict, cfg.BasePath)
-		if err != nil {
-			return err
+		ok, cerr := regexp.MatchString(constants.ValidBasePathRegexStrict, cfg.BasePath)
+		if cerr != nil {
+			return cerr
 		}
-		if m == false {
+		if !ok {
 			return fmt.Errorf("Base path %s does not match required format", cfg.BasePath)
 		}
 	}
