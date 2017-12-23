@@ -25,6 +25,8 @@ func BuildSink(cfg *conf.SpoonConfigSink) (interface{}, error) {
 		return NewLoggingSink(), nil
 	case "carbon":
 		return NewRobustCarbonSink(cfg)
+	case "statsd":
+		return NewStatsdSink(cfg)
 	default:
 		return nil, fmt.Errorf("Unrecognised sink type '%v'", cfg.Type)
 	}
