@@ -2,3 +2,4 @@ spoon
 spoon.json
 build
 /.vscode
+/vendor/

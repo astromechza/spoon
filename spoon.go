@@ -4,17 +4,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"regexp"
 
-	logging "github.com/op/go-logging"
-
 	"github.com/AstromechZA/spoon/agents"
 	"github.com/AstromechZA/spoon/conf"
 	"github.com/AstromechZA/spoon/constants"
-	slogging "github.com/AstromechZA/spoon/logging"
 	"github.com/AstromechZA/spoon/sink"
 )
 
@@ -35,8 +33,6 @@ which agents are configured.
 // Set this at build time using the -ldflags="-X main.SpoonVersion=X.YZ"
 var SpoonVersion = "<unofficial build>"
 
-var log = logging.MustGetLogger("spoon")
-
 func main() {
 
 	// first set up config flag options
@@ -44,7 +40,6 @@ func main() {
 	generateFlag := flag.Bool("generate", false, "Generate a new example config and print it to stdout.")
 	validateFlag := flag.Bool("validate", false, "Validate the config passed in via '-config'.")
 	versionFlag := flag.Bool("version", false, "Print the version string.")
-	debugFlag := flag.Bool("debug", false, "Print debug logging.")
 
 	// set a more verbose usage message.
 	flag.Usage = func() {
@@ -107,25 +102,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	// set up initial logging to stdout
-	slogging.Configure(&conf.SpoonConfigLog{}, *debugFlag)
-
 	// load config
-	log.Infof("Loading config from %s", configPath)
+	log.Printf("Loading config from %s", configPath)
 	cfg, err := conf.Load(&configPath)
 	if err != nil {
 		fmt.Printf("Failed to load config: %v\n", err.Error())
 		os.Exit(1)
 	}
 
-	// now that we have the config, we can reconfigure the logger according to
-	// the config
-	slogging.Configure(&cfg.Logging, *debugFlag)
-
 	// build sink
 	activeSink, err := sink.BuildSink(&cfg.Sink)
 	if err != nil {
-		log.Errorf("Failed to setup metric sink: %v\n", err.Error())
+		log.Printf("Failed to setup metric sink: %v\n", err.Error())
 		os.Exit(1)
 	}
 
@@ -148,7 +136,7 @@ func main() {
 	for _, a := range agentList {
 		err = agents.SpawnAgent(a, activeSink.(sink.Sink))
 		if err != nil {
-			log.Errorf("Failed to spawn agent %v: %v", a, err.Error())
+			log.Printf("Failed to spawn agent %v: %v", a, err.Error())
 			os.Exit(1)
 		}
 	}
@@ -158,7 +146,7 @@ func main() {
 	// notify that we are going to handle interrupts
 	signal.Notify(signalChannel, os.Interrupt)
 	for sig := range signalChannel {
-		log.Infof("Received %v signal. Stopping.", sig)
+		log.Printf("Received %v signal. Stopping.", sig)
 		os.Exit(0)
 	}
 }
@@ -220,9 +208,6 @@ func LoadAndValidateConfig(path string) error {
 
 func GenerateExampleConfig() *conf.SpoonConfig {
 	return &conf.SpoonConfig{
-		Logging: conf.SpoonConfigLog{
-			Path: "-",
-		},
 		BasePath: "example",
 		Agents: []conf.SpoonConfigAgent{
 			conf.SpoonConfigAgent{

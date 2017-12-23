@@ -45,8 +45,6 @@ which agents are configured.
 
   -config string
         Path to a Spoon config file.
-  -debug
-        Print debug logging.
   -generate
         Generate a new example config and print it to stdout.
   -validate
@@ -62,14 +60,12 @@ It should pass the validation provided by `-validate`.
 ## Configuration
 
 Spoon is configured via a json file passed into it via the `-config` option or
-read from `/etc/spoon.json`. This single file configures the logging, agents,
+read from `/etc/spoon.json`. This single file configures the agents,
 metrics destination, and paths. The example config, [spoon.example.json](spoon.example.json), was
 generated via the `-generate` option.
 
 See [doc/sinks.md](doc/sinks.md) for information on configuring the metrics sink
 or destination.
-
-See [doc/logging.md](doc/logging.md) for information on configuring the logging.
 
 See [doc/agents.md](doc/agents.md) for information on the agents provided.
 

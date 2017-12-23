@@ -1,8 +1,5 @@
 package constants
 
-
-
-
 // ValidPathPartRegex is the format of a part of a metric path
 const ValidPathPartRegex = "[a-zA-Z0-9\\-\\_]+"
 
@@ -32,8 +29,7 @@ const ValidAgentPathRegexStrict = "^" + ValidAgentPathRegex + "$"
 const ValidBasePathRegexStrict = "^" + ValidBasePathRegex + "$"
 
 // SpoonImage is just an ascii spoon image for fun
-const SpoonImage =
-`
+const SpoonImage = `
     __________        .-"""-.
    /          ''''---' .'    \
    \__________....---. '.    /
