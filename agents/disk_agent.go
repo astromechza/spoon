@@ -17,7 +17,7 @@ type diskAgent struct {
 	settings map[string]string
 }
 
-func NewDiskAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
+func NewDiskAgent(config *conf.SpoonConfigAgent) (Agent, error) {
 
 	settings := make(map[string]string, 0)
 	for k, v := range config.Settings {

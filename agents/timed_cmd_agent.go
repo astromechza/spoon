@@ -18,7 +18,7 @@ type timedCmdAgent struct {
 	ignoreError bool
 }
 
-func NewTimedCMDAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
+func NewTimedCMDAgent(config *conf.SpoonConfigAgent) (Agent, error) {
 
 	cmditem, ok := config.Settings["cmd"]
 	if ok == false {

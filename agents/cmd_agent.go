@@ -19,7 +19,7 @@ type cmdAgent struct {
 	lineRegexp regexp.Regexp
 }
 
-func NewCMDAgent(config *conf.SpoonConfigAgent) (interface{}, error) {
+func NewCMDAgent(config *conf.SpoonConfigAgent) (Agent, error) {
 
 	cmditem, ok := config.Settings["cmd"]
 	if ok == false {

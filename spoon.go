@@ -120,7 +120,7 @@ func main() {
 	}
 
 	// build the list of real agents
-	agentList := make([]interface{}, len(cfg.Agents))
+	agentList := make([]agents.Agent, len(cfg.Agents))
 	for i, c := range cfg.Agents {
 
 		if len(c.Path) > 0 && c.Path[0] == '.' {

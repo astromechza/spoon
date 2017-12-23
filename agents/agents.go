@@ -14,7 +14,6 @@ import (
 
 // The Agent type is an object that can gather and return a result.
 type Agent interface {
-
 	// return the config object for this agent
 	GetConfig() conf.SpoonConfigAgent
 
@@ -26,7 +25,7 @@ type Agent interface {
 // the Agent interface.
 // This method will return an error if there is no constructor for the
 // agent type or if an error occurs while constructing the object.
-func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
+func BuildAgent(agentConfig *conf.SpoonConfigAgent) (Agent, error) {
 	switch strings.ToLower(agentConfig.Type) {
 	case "disk":
 		return NewDiskAgent(agentConfig)
@@ -55,14 +54,10 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (interface{}, error) {
 
 // SpawnAgent will begin running the given agent in a loop based on the
 // interval for that agent.
-func SpawnAgent(agent interface{}, s sink.Sink) error {
-	agentO, ok := agent.(Agent)
-	if ok != true {
-		return fmt.Errorf("Failed to cast interface %v to Agent", agent)
-	}
+func SpawnAgent(agent Agent, s sink.Sink) error {
 
-	if agentO.GetConfig().Enabled == false {
-		log.Printf("Skipping agent %v because it is disabled.", agentO.GetConfig())
+	if agent.GetConfig().Enabled == false {
+		log.Printf("Skipping agent %v because it is disabled.", agent.GetConfig())
 		return nil
 	}
 
@@ -97,6 +92,6 @@ func SpawnAgent(agent interface{}, s sink.Sink) error {
 			sleep := intervalNanos * (1.0 - math.Mod(float64(time.Now().UnixNano()-spawnTime)/intervalNanos, float64(1)))
 			time.Sleep(time.Duration(sleep))
 		}
-	}(agentO)
+	}(agent)
 	return nil
 }
