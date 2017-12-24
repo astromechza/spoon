@@ -42,3 +42,6 @@ fi
 
 echo "Copying ${tempdir}/${platform}/spoon to ${DESTINATION_DIR}.."
 cp "${tempdir}/${platform}/spoon" "${DESTINATION_DIR}"
+
+# cleanup
+rm -rf "${tempdir}"

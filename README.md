@@ -60,18 +60,6 @@ The example configuration produced by `-generate` will have all agents enabled
 with some sane defaults and will send metrics to the log while logging to stdout.
 It should pass the validation provided by `-validate`.
 
-## Configuration
-
-Spoon is configured via a json file passed into it via the `-config` option or
-read from `/etc/spoon.json`. This single file configures the agents,
-metrics destination, and paths. The example config, [spoon.example.json](spoon.example.json), was
-generated via the `-generate` option.
-
-See [doc/sinks.md](doc/sinks.md) for information on configuring the metrics sink
-or destination.
-
-See [doc/agents.md](doc/agents.md) for information on the agents provided.
-
 ## Installation
 
 Download the binary from the releases page on Github or build it yourself if you're brave.
@@ -81,10 +69,10 @@ Add it to `/usr/bin/`, `~/bin` or wherever is appropriate. You can do this all i
 $ curl https://raw.githubusercontent.com/AstromechZA/spoon/master/get_spoon.sh | sudo bash
 ```
 
-Setup your config file in `/etc/spoon.config.json`:
+Setup your config file in `/etc/spoon.json`:
 
 ```
-$ spoon -generate > /etc/spoon.config.json
+$ spoon -generate > /etc/spoon.json
 ```
 
 And set up your service definition in `/lib/systemd/system/spoon.service`:
@@ -96,12 +84,24 @@ Documentation=https://github.com/AstromechZA/spoon
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/spoon -config /etc/spoon.config.json
+ExecStart=/usr/bin/spoon -config /etc/spoon.json
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+## Configuration
+
+Spoon is configured via a json file passed into it via the `-config` option or
+read from `/etc/spoon.json`. This single file configures the agents,
+metrics destination, and paths. The example config, [spoon.example.json](spoon.example.json), was
+generated via the `-generate` option.
+
+See [doc/sinks.md](doc/sinks.md) for information on configuring the metrics sink
+or destination.
+
+See [doc/agents.md](doc/agents.md) for information on the agents provided.
 
 ## Running in production
 
