@@ -75,7 +75,11 @@ See [doc/agents.md](doc/agents.md) for information on the agents provided.
 ## Installation
 
 Download the binary from the releases page on Github or build it yourself if you're brave.
-Add it to `/usr/bin/`, `~/bin` or wherever is appropriate.
+Add it to `/usr/bin/`, `~/bin` or wherever is appropriate. You can do this all in one step using:
+
+```
+$ curl https://raw.githubusercontent.com/AstromechZA/spoon/master/get_spoon.sh | sudo bash
+```
 
 Setup your config file in `/etc/spoon.config.json`:
 
