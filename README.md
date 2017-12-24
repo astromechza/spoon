@@ -138,8 +138,3 @@ It 'feeds' metrics to Graphite?
 $ dep ensure
 $ ./make_official
 ```
-
-## TODO
-
-- Switch everything to a Statsd style interface (counter, gauge, etc..). This would better support a Statsd sink
-backend or Prometheus backend.
