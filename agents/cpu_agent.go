@@ -34,8 +34,7 @@ func (a *cpuAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *cpuAgent) Tick(sinkBatcher *sink.Batcher) error {
-	sinkBatcher.Clear()
+func (a *cpuAgent) Tick(s sink.Sink) error {
 
 	now := time.Now()
 	cpuTimesSet, err := cpu.Times(true)
@@ -54,10 +53,7 @@ func (a *cpuAgent) Tick(sinkBatcher *sink.Batcher) error {
 		if a.hasPrevCPU && len(a.prevCPUTotals) > i {
 			percent := a.calculateCPUPercent(a.prevCPUTotals[i], totals[i], a.prevCPUBusys[i], busys[i])
 			subpath := fmt.Sprintf("%s.%v.cpu_percent", a.config.Path, i)
-			err = sinkBatcher.Put(subpath, percent)
-			if err != nil {
-				return err
-			}
+			s.Gauge(subpath, percent)
 		}
 	}
 
@@ -66,7 +62,7 @@ func (a *cpuAgent) Tick(sinkBatcher *sink.Batcher) error {
 	a.prevCPUTotals = totals
 	a.prevCPUTime = now
 
-	return sinkBatcher.Flush()
+	return nil
 }
 
 func (a *cpuAgent) calculateCPUPercent(t1t, t2t, t1b, t2b float64) float64 {

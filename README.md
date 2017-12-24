@@ -1,7 +1,7 @@
 # Spoon Readme
 
 Spoon is my implementation of a stats daemon in Go which sends its stats to a
-Carbon-cache or Carbon-aggregator. It aims to closely follow how python-diamond
+Statsd-compatible endpoint. It aims to closely follow how python-diamond
 works, but quite a bit simpler and easier to configure.
 
 Because it's written in Go, it will be deployable as a single binary and all of
@@ -11,10 +11,11 @@ compile and run on Windows too, but results may vary.
 My aim in writing this software is to learn a bit more about Golang, and also
 deploy the daemon to my home servers.
 
-If you don't know about the Graphite project, Carbon, and interfaces like
-Grafana, check out: [graphite.readthedocs.io](http://graphite.readthedocs.io/en/latest/)
-and [grafana.org](http://grafana.org/).
+### References
 
+- statsd https://github.com/etsy/statsd
+- graphite https://github.com/graphite-project
+- grafana https://grafana.com/
 
 ## Why should I use this?
 
@@ -32,10 +33,9 @@ and [grafana.org](http://grafana.org/).
 ## Usage
 
 ```
-$ ./spoon --help
-Spoon is a simple metric gatherer for Linux systems. Like the popular Diamond
+$ Spoon is a simple metric gatherer for Linux systems. Like the popular Diamond
 daemon, it runs a configurable number of gathering agents and forwards the
-results to a Carbon Aggregator or Cache.
+results to Statsd.
 
 By default, it looks for a config file at /etc/spoon.json but this path can be
 specified at the command line using '-config'.
@@ -44,13 +44,13 @@ Spoon does not require root permissions to run, but might need them depending on
 which agents are configured.
 
   -config string
-        Path to a Spoon config file.
+    	Path to a Spoon config file.
   -generate
-        Generate a new example config and print it to stdout.
+    	Generate a new example config and print it to stdout.
   -validate
-        Validate the config passed in via '-config'.
+    	Validate the config passed in via '-config'.
   -version
-        Print the version string.
+    	Print the version string.
 ```
 
 The example configuration produced by `-generate` will have all agents enabled

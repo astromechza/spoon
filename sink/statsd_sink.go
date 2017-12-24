@@ -1,24 +1,39 @@
 package sink
 
 import (
-	"sync"
+	"fmt"
+	"log"
 
+	"github.com/AstromechZA/go-statsd"
 	"github.com/AstromechZA/spoon/conf"
 )
 
 type StatsdSink struct {
-	lock sync.Mutex
+	client *statsd.Client
 }
 
 func NewStatsdSink(cfg *conf.SpoonConfigSink) (*StatsdSink, error) {
-	return &StatsdSink{}, nil
+	addr, ok := cfg.Settings["address"]
+	if !ok {
+		return nil, fmt.Errorf("statsd sink settings missing 'address'")
+	}
+
+	client, err := statsd.New(
+		statsd.Address(addr.(string)),
+		statsd.ErrorHandler(func(e error) {
+			log.Printf("Statsd sink error: %s", e)
+		}),
+		statsd.LazyConnect(),
+		statsd.FlushesBetweenReconnect(10*60*5),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &StatsdSink{client: client}, nil
 }
 
-// Put writes a path/value pair to the log
-func (s *StatsdSink) Put(path string, value float64) error {
-	return nil
-}
-
-func (s *StatsdSink) PutBatch(batch []Metric) error {
-	return nil
+// Gauge writes a path/value pair to the log
+func (s *StatsdSink) Gauge(path string, value interface{}) {
+	s.client.Gauge(path, value)
 }

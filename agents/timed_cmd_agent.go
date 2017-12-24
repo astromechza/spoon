@@ -64,7 +64,7 @@ func (a *timedCmdAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *timedCmdAgent) Tick(sinkBatcher *sink.Batcher) error {
+func (a *timedCmdAgent) Tick(s sink.Sink) error {
 	start := time.Now().UnixNano()
 
 	_, err := exec.Command(a.cmd[0], a.cmd[1:]...).Output()
@@ -74,5 +74,6 @@ func (a *timedCmdAgent) Tick(sinkBatcher *sink.Batcher) error {
 	}
 
 	elapsed := time.Now().UnixNano() - start
-	return sinkBatcher.PutAndFlush(a.config.Path, float64(elapsed)/float64(time.Second))
+	s.Gauge(a.config.Path, float64(elapsed)/float64(time.Second))
+	return nil
 }

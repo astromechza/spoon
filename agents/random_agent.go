@@ -54,8 +54,9 @@ func (a *randomAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *randomAgent) Tick(sinkBatcher *sink.Batcher) error {
+func (a *randomAgent) Tick(s sink.Sink) error {
 	rng := a.maxValue - a.minValue
 	v := a.random.Float64()*rng + a.minValue
-	return sinkBatcher.PutAndFlush(a.config.Path, v)
+	s.Gauge(a.config.Path, v)
+	return nil
 }

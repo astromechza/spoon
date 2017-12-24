@@ -38,8 +38,7 @@ func (a *diskAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
-	sinkBatcher.Clear()
+func (a *diskAgent) Tick(s sink.Sink) error {
 
 	devre := a.settings["device_regex"]
 
@@ -59,47 +58,20 @@ func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
 				}
 			}
 
-			usage, err := disk.Usage(p.Mountpoint)
-			if err == nil {
+			usage, uerr := disk.Usage(p.Mountpoint)
+			if uerr == nil {
 				prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
 
-				err = sinkBatcher.Put(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.free", prefixPath), float64(usage.Free))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.used", prefixPath), float64(usage.Used))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.used_percent", prefixPath), float64(usage.UsedPercent))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.inode_free", prefixPath), float64(usage.InodesFree))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.inode_used", prefixPath), float64(usage.InodesUsed))
-				if err != nil {
-					return err
-				}
-
-				err = sinkBatcher.Put(fmt.Sprintf("%s.inode_used_percent", prefixPath), float64(usage.InodesUsedPercent))
-				if err != nil {
-					return err
-				}
+				s.Gauge(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
+				s.Gauge(fmt.Sprintf("%s.free", prefixPath), float64(usage.Free))
+				s.Gauge(fmt.Sprintf("%s.used", prefixPath), float64(usage.Used))
+				s.Gauge(fmt.Sprintf("%s.used_percent", prefixPath), float64(usage.UsedPercent))
+				s.Gauge(fmt.Sprintf("%s.inode_free", prefixPath), float64(usage.InodesFree))
+				s.Gauge(fmt.Sprintf("%s.inode_used", prefixPath), float64(usage.InodesUsed))
+				s.Gauge(fmt.Sprintf("%s.inode_used_percent", prefixPath), float64(usage.InodesUsedPercent))
 
 			} else {
-				log.Printf("Fetching usage for disk %v failed: %v", p.Mountpoint, err.Error())
+				log.Printf("Fetching usage for disk %v failed: %v", p.Mountpoint, uerr.Error())
 			}
 		}
 	} else {
@@ -124,31 +96,17 @@ func (a *diskAgent) Tick(sinkBatcher *sink.Batcher) error {
 			log.Printf("Outputting metrics for %v because it matched device_regex", deviceName)
 			prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(deviceName))
 
-			err = sinkBatcher.Put(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
-			if err != nil {
-				return err
-			}
-
-			err = sinkBatcher.Put(fmt.Sprintf("%s.write_count", prefixPath), float64(iostat.WriteCount))
-			if err != nil {
-				return err
-			}
-
-			err = sinkBatcher.Put(fmt.Sprintf("%s.read_bytes", prefixPath), float64(iostat.ReadBytes))
-			if err != nil {
-				return err
-			}
-
-			err = sinkBatcher.Put(fmt.Sprintf("%s.write_bytes", prefixPath), float64(iostat.WriteBytes))
-			if err != nil {
-				return err
-			}
+			s.Gauge(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
+			s.Gauge(fmt.Sprintf("%s.write_count", prefixPath), float64(iostat.WriteCount))
+			s.Gauge(fmt.Sprintf("%s.read_bytes", prefixPath), float64(iostat.ReadBytes))
+			s.Gauge(fmt.Sprintf("%s.write_bytes", prefixPath), float64(iostat.WriteBytes))
+			s.Gauge(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
 		}
 
 	} else {
 		log.Printf("Fetching iocounters for system failed: %v", err.Error())
 	}
-	return sinkBatcher.Flush()
+	return nil
 }
 
 func (a *diskAgent) formatDeviceName(device string) string {

@@ -55,8 +55,7 @@ func (a *cmdAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
-	sinkBatcher.Clear()
+func (a *cmdAgent) Tick(s sink.Sink) error {
 
 	out, err := exec.Command(a.cmd[0], a.cmd[1:]...).Output()
 	if err != nil {
@@ -77,12 +76,9 @@ func (a *cmdAgent) Tick(sinkBatcher *sink.Batcher) error {
 			if subpath[0] == '.' {
 				subpath = a.config.Path + subpath
 			}
-			err = sinkBatcher.Put(subpath, value)
-			if err != nil {
-				return err
-			}
+			s.Gauge(subpath, value)
 		}
 	}
 
-	return sinkBatcher.Flush()
+	return nil
 }

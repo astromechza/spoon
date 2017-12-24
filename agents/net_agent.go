@@ -34,8 +34,7 @@ func (a *netAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
-	sinkBatcher.Clear()
+func (a *netAgent) Tick(s sink.Sink) error {
 
 	iocounters, err := net.IOCounters(true)
 	if err != nil {
@@ -53,25 +52,10 @@ func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
 		log.Printf("Outputting metrics for %v because it matched nic_regex", nicio.Name)
 		prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 
-		err = sinkBatcher.Put(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
-		if err != nil {
-			return err
-		}
-
-		err = sinkBatcher.Put(fmt.Sprintf("%s.bytes_recv", prefixPath), float64(nicio.BytesRecv))
-		if err != nil {
-			return err
-		}
-
-		err = sinkBatcher.Put(fmt.Sprintf("%s.packets_sent", prefixPath), float64(nicio.PacketsSent))
-		if err != nil {
-			return err
-		}
-
-		err = sinkBatcher.Put(fmt.Sprintf("%s.packets_recv", prefixPath), float64(nicio.PacketsRecv))
-		if err != nil {
-			return err
-		}
+		s.Gauge(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
+		s.Gauge(fmt.Sprintf("%s.bytes_recv", prefixPath), float64(nicio.BytesRecv))
+		s.Gauge(fmt.Sprintf("%s.packets_sent", prefixPath), float64(nicio.PacketsSent))
+		s.Gauge(fmt.Sprintf("%s.packets_recv", prefixPath), float64(nicio.PacketsRecv))
 
 		// TODO do we need the error and dropped counts?
 	}
@@ -80,5 +64,5 @@ func (a *netAgent) Tick(sinkBatcher *sink.Batcher) error {
 	// would be useful to track udp/tcp
 	// conntrack stats?
 
-	return sinkBatcher.Flush()
+	return nil
 }

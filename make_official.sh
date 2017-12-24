@@ -3,7 +3,7 @@
 set -e
 
 # first build the version string
-VERSION=1.4
+VERSION=2.0
 
 # add the git commit id and date
 VERSION="$VERSION (commit $(git rev-parse --short HEAD) @ $(git log -1 --date=short --pretty=format:%cd))"
@@ -22,6 +22,9 @@ function buildbinary {
     export GOARCH=$goarch
 
     go build -i -v -o "$outputfolder/spoon" -ldflags "-X \"main.SpoonVersion=$VERSION\""
+
+    unset GOOS
+    unset GOARCH
 
     echo "Done"
     ls -l "$outputfolder/spoon"

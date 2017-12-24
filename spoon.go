@@ -18,7 +18,7 @@ import (
 
 const usageString = `Spoon is a simple metric gatherer for Linux systems. Like the popular Diamond
 daemon, it runs a configurable number of gathering agents and forwards the
-results to a Carbon Aggregator or Cache.
+results to Statsd.
 
 By default, it looks for a config file at /etc/spoon.json but this path can be
 specified at the command line using '-config'.

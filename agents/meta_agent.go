@@ -43,11 +43,10 @@ func (a *metaAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *metaAgent) Tick(sinkBatcher *sink.Batcher) error {
-	sinkBatcher.Clear()
+func (a *metaAgent) Tick(s sink.Sink) error {
 
-	err1 := a.doCPU(sinkBatcher)
-	err2 := a.doMem(sinkBatcher)
+	err1 := a.doCPU(s)
+	err2 := a.doMem(s)
 	if err1 != nil {
 		return err1
 	}
@@ -55,10 +54,10 @@ func (a *metaAgent) Tick(sinkBatcher *sink.Batcher) error {
 		return err2
 	}
 
-	return sinkBatcher.Flush()
+	return nil
 }
 
-func (a *metaAgent) doCPU(sinkBatcher *sink.Batcher) error {
+func (a *metaAgent) doCPU(s sink.Sink) error {
 
 	procTimes, err := a.process.Times()
 	if err != nil {
@@ -71,9 +70,7 @@ func (a *metaAgent) doCPU(sinkBatcher *sink.Batcher) error {
 	if a.hasPrevCPU {
 		delta := now.Sub(a.prevCPUTime).Seconds() * float64(a.numCPU)
 		percent := a.calculateCPUPercent(a.prevCPUTotal, total, delta, a.numCPU)
-		if err = sinkBatcher.Put(a.config.Path+".cpu_percent", percent); err != nil {
-			return err
-		}
+		s.Gauge(a.config.Path+".cpu_percent", percent)
 	}
 
 	a.hasPrevCPU = true
@@ -90,10 +87,11 @@ func (a *metaAgent) calculateCPUPercent(t1, t2 float64, delta float64, numcpu in
 	return (((t2 - t1) / delta) * 100) * float64(numcpu)
 }
 
-func (a *metaAgent) doMem(sinkBatcher *sink.Batcher) error {
+func (a *metaAgent) doMem(s sink.Sink) error {
 	memInfo, err := a.process.MemoryInfo()
 	if err != nil {
 		return err
 	}
-	return sinkBatcher.Put(a.config.Path+".rss", float64(memInfo.RSS))
+	s.Gauge(a.config.Path+".rss", float64(memInfo.RSS))
+	return nil
 }

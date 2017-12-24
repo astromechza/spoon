@@ -18,7 +18,7 @@ type Agent interface {
 	GetConfig() conf.SpoonConfigAgent
 
 	// fetch a result for this agent
-	Tick(sinkBatcher *sink.Batcher) error
+	Tick(sink.Sink) error
 }
 
 // BuildAgent will return a pointer to a constructed object that follows
@@ -70,9 +70,6 @@ func SpawnAgent(agent Agent, s sink.Sink) error {
 		log.Printf("Delaying %s agent by %.2f seconds in order to spread the agents out and reduce spikes", conf.Type, delay)
 		time.Sleep(time.Duration(delay) * time.Second)
 
-		// set up metric batch for agent
-		batcher := sink.NewBatcher(s)
-
 		intervalNanos := float64(conf.Interval) * float64(time.Second)
 		spawnTime := time.Now().UnixNano()
 		var tickStart time.Time
@@ -80,7 +77,7 @@ func SpawnAgent(agent Agent, s sink.Sink) error {
 		for {
 			// do call to agent
 			tickStart = time.Now()
-			err := agent.Tick(batcher)
+			err := agent.Tick(s)
 			tickElapsed = time.Since(tickStart)
 			if err != nil {
 				log.Printf("Agent %v@%v returned an error after %v: %v", conf.Type, conf.Path, tickElapsed.String(), err.Error())

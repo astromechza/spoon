@@ -1,13 +1,12 @@
 # Sinks
 
 A sink, in the Spoon world, is a destination for metrics. Two sinks are available
-at the time of writing: 'log', and 'carbon'.
+at the time of writing: 'log', and 'statsd'.
 
 The `"log"` sink will just print the gathered metrics in batches to the standard
 logging output.
 
-The `"carbon"` sink will send the metrics in batches to a Carbon aggregator/relay/cache
-specified by the `"carbon_host"` and `"carbon_port"` settings.
+The `"statsd"` sink will send the metrics to a Statsd endpoint.
 
 To configure a sink, add the top-level `"sink"` section to your config file.
 
@@ -21,16 +20,15 @@ Print metrics to the log:
 }
 ```
 
-## Carbon sink
+## Statsd sink
 
-Send metrics to a carbon instance:
+Send metrics to a Statsd instance:
 
 ```
 "sink": {
-    "type": "carbon",
+    "type": "statsd",
     "settings": {
-        "carbon_host": "carbon.mydomain.com",
-        "carbon_port": 2003
+        "address": "statsd.domain.com:8125"
     }
 }
 ```

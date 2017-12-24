@@ -19,10 +19,11 @@ func (a *uptimeAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *uptimeAgent) Tick(sinkBatcher *sink.Batcher) error {
+func (a *uptimeAgent) Tick(s sink.Sink) error {
 	ut, err := host.Uptime()
 	if err != nil {
 		return err
 	}
-	return sinkBatcher.PutAndFlush(a.config.Path, float64(ut))
+	s.Gauge(a.config.Path, float64(ut))
+	return nil
 }

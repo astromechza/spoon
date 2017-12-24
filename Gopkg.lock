@@ -2,6 +2,11 @@
 
 
 [[projects]]
+  name = "github.com/AstromechZA/go-statsd"
+  packages = ["."]
+  revision = "71d3079a9a87d1622b1f789b0f608adf284634b8"
+
+[[projects]]
   branch = "master"
   name = "github.com/StackExchange/wmi"
   packages = ["."]
@@ -34,6 +39,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "aee2a92f1885ec7c8f94b5643653fe43265ed80944caf6982a1ebd82602f9c0c"
+  inputs-digest = "e7230c8aa7b58cfdb88332eaee01bdd57c84154d877aea0852533c3629dd01e0"
   solver-name = "gps-cdcl"
   solver-version = 1

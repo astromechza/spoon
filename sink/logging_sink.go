@@ -1,7 +1,6 @@
 package sink
 
 import (
-	"fmt"
 	"log"
 	"sync"
 )
@@ -19,26 +18,10 @@ func NewLoggingSink() *LoggingSink {
 	return &LoggingSink{lock: sync.Mutex{}}
 }
 
-// Put writes a path/value pair to the log
-func (s *LoggingSink) Put(path string, value float64) error {
+// Gauge writes a path/value pair to the log
+func (s *LoggingSink) Gauge(path string, value interface{}) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
 	log.Printf("Value for '%v' = %v", path, value)
-
-	return nil
-}
-
-func (s *LoggingSink) PutBatch(batch []Metric) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-
-	output := fmt.Sprintf("LoggingSink received batch of %v metrics:", len(batch))
-	for _, m := range batch {
-		output += fmt.Sprintf("\nValue for '%v' = %v", m.Path, m.Value)
-	}
-
-	log.Printf(output)
-
-	return nil
 }

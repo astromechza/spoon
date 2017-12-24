@@ -19,6 +19,7 @@ func (a *timeAgent) GetConfig() conf.SpoonConfigAgent {
 	return a.config
 }
 
-func (a *timeAgent) Tick(sinkBatcher *sink.Batcher) error {
-	return sinkBatcher.PutAndFlush(a.config.Path, float64(time.Now().UnixNano()))
+func (a *timeAgent) Tick(s sink.Sink) error {
+	s.Gauge(a.config.Path, float64(time.Now().UnixNano()))
+	return nil
 }
