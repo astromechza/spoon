@@ -72,6 +72,33 @@ or destination.
 
 See [doc/agents.md](doc/agents.md) for information on the agents provided.
 
+## Installation
+
+Download the binary from the releases page on Github or build it yourself if you're brave.
+Add it to `/usr/bin/`, `~/bin` or wherever is appropriate.
+
+Setup your config file in `/etc/spoon.config.json`:
+
+```
+$ spoon -generate > /etc/spoon.config.json
+```
+
+And set up your service definition in `/lib/systemd/system/spoon.service`:
+
+```
+[Unit]
+Description=spoon metrics daemon
+Documentation=https://github.com/AstromechZA/spoon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/spoon -config /etc/spoon.config.json
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Running in production
 
 Spoon is not designed to fork itself and make sure it is always running, it

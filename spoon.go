@@ -81,6 +81,11 @@ func main() {
 
 	log.SetFlags(log.LUTC | log.Ldate | log.Ltime | log.Lshortfile)
 
+	if *configFlag == "" {
+		os.Stderr.WriteString("You much provide -config")
+		os.Exit(1)
+	}
+
 	// load the config file
 	configPath := (*configFlag)
 	if configPath == "" {
