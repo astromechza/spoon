@@ -1,5 +1,7 @@
 # Spoon Readme
 
+[![Build Status](https://travis-ci.org/AstromechZA/spoon.svg)](https://travis-ci.org/AstromechZA/spoon)
+
 Spoon is my implementation of a stats daemon in Go which sends its stats to a
 Statsd-compatible endpoint. It aims to closely follow how python-diamond
 works, but quite a bit simpler and easier to configure.
@@ -33,7 +35,8 @@ deploy the daemon to my home servers.
 ## Usage
 
 ```
-$ Spoon is a simple metric gatherer for Linux systems. Like the popular Diamond
+$ ./spoon --help
+Spoon is a simple metric gatherer for Linux systems. Like the popular Diamond
 daemon, it runs a configurable number of gathering agents and forwards the
 results to Statsd.
 
