@@ -9,7 +9,7 @@ env:
 
 script:
   - ./make_official.sh
-  - ./spoon -help
+  - ./spoon -help || true
   - ./spoon -version
   - ./spoon -generate > dummy.config.json
   - ./spoon -validate -config dummy.config.json
