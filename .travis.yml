@@ -9,3 +9,9 @@ go:
 env:
   - GOOS=darwin
   - GOOS=linux
+
+after_success:
+  - ./spoon -help
+  - ./spoon -version
+  - ./spoon -generate > dummy.config.json
+  - ./spoon -validate -config dummy.config.json
