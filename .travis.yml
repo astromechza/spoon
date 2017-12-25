@@ -10,6 +10,6 @@ env:
 script:
   - ./make_official.sh
   - ./spoon -help || true
-  - ./spoon -version
+  - ./spoon -version | grep $(cat VERSION)
   - ./spoon -generate > dummy.config.json
   - ./spoon -validate -config dummy.config.json

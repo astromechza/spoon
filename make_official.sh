@@ -29,6 +29,9 @@ function buildbinary {
     echo
 }
 
+# gzip the things
+tar -czvf build/binaries.tar.gz -s '/build//' build/*/spoon
+
 # build for mac
 buildbinary darwin amd64
 
@@ -36,4 +39,4 @@ buildbinary darwin amd64
 buildbinary linux amd64
 
 # and build for dev
-go build
+go build -ldflags "-X \"main.SpoonVersion=$VERSION\""
