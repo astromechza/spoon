@@ -10,7 +10,7 @@ env:
   - GOOS=darwin
   - GOOS=linux
 
-after_success:
+after_build:
   - ./spoon -help
   - ./spoon -version
   - ./spoon -generate > dummy.config.json
