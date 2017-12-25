@@ -107,6 +107,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 	} else {
 		log.Printf("Fetching iocounters for system failed: %v", err.Error())
 	}
+
 	return nil
 }
 
