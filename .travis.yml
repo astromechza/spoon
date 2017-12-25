@@ -18,4 +18,4 @@ deploy:
   file: build/binaries.tar.gz
   on:
     repo: AstromechZA/spoon
-    condition: "$GOOS = linux"
+    branch: master
