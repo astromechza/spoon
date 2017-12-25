@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"sync"
 
 	"github.com/AstromechZA/spoon/agents"
 	"github.com/AstromechZA/spoon/conf"
@@ -38,6 +39,7 @@ func mainInner() error {
 	generateFlag := flag.Bool("generate", false, "Generate a new example config and print it to stdout.")
 	validateFlag := flag.Bool("validate", false, "Validate the config passed in via '-config'.")
 	versionFlag := flag.Bool("version", false, "Print the version string.")
+	onceFlag := flag.Bool("once", false, "Run each agent once, immediately, and then exit.")
 
 	// set a more verbose usage message.
 	flag.Usage = func() {
@@ -122,6 +124,27 @@ func mainInner() error {
 			os.Exit(1)
 		}
 		agentList[i] = agent
+	}
+
+	// run each agent once
+	if *onceFlag {
+		hasErrors := false
+		group := sync.WaitGroup{}
+		for _, a := range agentList {
+			group.Add(1)
+			go func(current agents.Agent) {
+				if aerr := current.Tick(activeSink.(sink.Sink)); aerr != nil {
+					log.Printf("%s Error: %s", current, err)
+					hasErrors = true
+				}
+				group.Done()
+			}(a)
+		}
+		group.Wait()
+		if hasErrors {
+			return fmt.Errorf("some agents had errors")
+		}
+		return nil
 	}
 
 	// now spawn each of the agents

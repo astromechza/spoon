@@ -13,3 +13,4 @@ script:
   - ./spoon -version | grep $(cat VERSION)
   - ./spoon -generate > dummy.config.json
   - ./spoon -validate -config dummy.config.json
+  - ./spoon -config dummy.config.json -once
