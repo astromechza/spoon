@@ -14,7 +14,7 @@
             "interval": 60,
             "path": ".disk",
             "settings": {
-                "device_regex": "xvd[a-z]+\\d$|disk\\d$"
+                "device_regex": ""
             }
         },
         {

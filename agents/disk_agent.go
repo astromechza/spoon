@@ -44,17 +44,14 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 
 	// fetch all the physical disk partitions. the boolean indicates whether
 	// non-physical partitions should be returned too.
-	parts, err := disk.Partitions(false)
+	parts, err := disk.Partitions(true)
 	if err == nil {
 		// loop through all the partitions returned
 		for _, p := range parts {
 
 			// check against regex if provided
-			if devre != "" {
-				m, _ := regexp.MatchString(devre, p.Device)
-				if m == false {
-					continue
-				}
+			if m, _ := regexp.MatchString(devre, p.Device); m == false {
+				continue
 			}
 
 			usage, uerr := disk.Usage(p.Mountpoint)
@@ -86,11 +83,8 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 			deviceName := "/dev/" + path
 
 			// check against regex if provided
-			if devre != "" {
-				m, _ := regexp.MatchString(devre, deviceName)
-				if m == false {
-					continue
-				}
+			if m, _ := regexp.MatchString(devre, deviceName); m == false {
+				continue
 			}
 
 			log.Printf("Outputting IO Counters for %v because it matched device_regex", deviceName)
