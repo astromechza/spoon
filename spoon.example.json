@@ -14,7 +14,7 @@
             "interval": 60,
             "path": ".disk",
             "settings": {
-                "device_regex": ".*$"
+                "device_regex": "d[a-z+]\\d$|disk\\d$"
             }
         },
         {
