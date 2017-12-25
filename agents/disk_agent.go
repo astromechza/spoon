@@ -53,7 +53,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 			if devre != "" {
 				m, _ := regexp.MatchString(devre, p.Device)
 				if m == false {
-					log.Printf("Skipping usage for %v because it didn't match device_regex", p.Device)
+					log.Printf("Skipping usage for %v because it didn't match device_regex", p)
 					continue
 				}
 			}

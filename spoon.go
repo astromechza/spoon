@@ -76,7 +76,7 @@ func mainInner() error {
 		return nil
 	}
 
-	log.SetFlags(log.LUTC | log.Ldate | log.Ltime | log.Lshortfile)
+	log.SetFlags(log.LUTC | log.Ldate | log.Ltime | log.Lshortfile | log.Lmicroseconds)
 
 	// load the config file
 	configPath := (*configFlag)
