@@ -8,9 +8,9 @@ script:
 - ./make_official.sh
 - ./spoon -help || true
 - ./spoon -version | grep $(cat VERSION)
-- ./spoon -generate > dummy.config.json
-- ./spoon -validate -config dummy.config.json
-- ./spoon -config dummy.config.json -once
+- ./spoon -generate > /tmp/dummy.config.json
+- ./spoon -validate -config /tmp/dummy.config.json
+- ./spoon -config /tmp/dummy.config.json -once
 deploy:
   provider: releases
   api_key:
