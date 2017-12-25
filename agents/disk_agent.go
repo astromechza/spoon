@@ -60,6 +60,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 
 			usage, uerr := disk.Usage(p.Mountpoint)
 			if uerr == nil {
+				log.Printf("Outputting Usage for %v because it matched device_regex", p)
 				prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
 
 				s.Gauge(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
@@ -93,7 +94,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 				}
 			}
 
-			log.Printf("Outputting metrics for %v because it matched device_regex", deviceName)
+			log.Printf("Outputting IO Counters for %v because it matched device_regex", iostat)
 			prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(deviceName))
 
 			s.Gauge(fmt.Sprintf("%s.read_count", prefixPath), float64(iostat.ReadCount))
