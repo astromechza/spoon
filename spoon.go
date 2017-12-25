@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"regexp"
 
 	"github.com/AstromechZA/spoon/agents"
 	"github.com/AstromechZA/spoon/conf"
@@ -25,7 +24,6 @@ specified at the command line using '-config'.
 
 Spoon does not require root permissions to run, but might need them depending on
 which agents are configured.
-
 `
 
 // SpoonVersion is the version string
@@ -33,7 +31,7 @@ which agents are configured.
 // Set this at build time using the -ldflags="-X main.SpoonVersion=X.YZ"
 var SpoonVersion = "<unofficial build>"
 
-func main() {
+func mainInner() error {
 
 	// first set up config flag options
 	configFlag := flag.String("config", "", "Path to a Spoon config file.")
@@ -43,7 +41,7 @@ func main() {
 
 	// set a more verbose usage message.
 	flag.Usage = func() {
-		os.Stderr.WriteString(usageString)
+		fmt.Println(usageString)
 		flag.PrintDefaults()
 	}
 	// parse them
@@ -54,17 +52,15 @@ func main() {
 		fmt.Println("Spoon Version " + SpoonVersion)
 		fmt.Println(constants.SpoonImage)
 		fmt.Println("Project: https://github.com/AstromechZA/spoon")
-		os.Exit(0)
+		return nil
 	}
 
 	if *generateFlag {
 		if *validateFlag {
-			os.Stderr.WriteString("Cannot use both -validate and -generate.\n")
-			os.Exit(1)
+			return fmt.Errorf("Cannot use both -validate and -generate.")
 		}
-		if (*configFlag) != "" {
-			os.Stderr.WriteString("Cannot use both -generate and -config.\n")
-			os.Exit(1)
+		if *configFlag != "" {
+			return fmt.Errorf("Cannot use both -generate and -config.")
 		}
 	}
 
@@ -72,11 +68,10 @@ func main() {
 	if *generateFlag {
 		bytes, err := json.MarshalIndent(GenerateExampleConfig(), "", "    ")
 		if err != nil {
-			fmt.Printf("Failed to serialise config: %v\n", err.Error())
-			os.Exit(1)
+			return fmt.Errorf("Failed to serialise config: %v", err)
 		}
 		fmt.Println(string(bytes))
-		os.Exit(0)
+		return nil
 	}
 
 	log.SetFlags(log.LUTC | log.Ldate | log.Ltime | log.Lshortfile)
@@ -88,35 +83,30 @@ func main() {
 	}
 	configPath, err := filepath.Abs(configPath)
 	if err != nil {
-		fmt.Printf("Failed to identify config path: %v\n", err.Error())
-		os.Exit(1)
-	}
-
-	// quick validate the config
-	err = LoadAndValidateConfig(configPath)
-	if err != nil {
-		fmt.Printf("Config failed validation: %v\n", err.Error())
-		os.Exit(1)
-	}
-
-	if *validateFlag {
-		fmt.Printf("No problems found in config from %s. Looks good to me!\n", configPath)
-		os.Exit(0)
+		return fmt.Errorf("Failed to identify config path: %s", err)
 	}
 
 	// load config
 	log.Printf("Loading config from %s", configPath)
-	cfg, err := conf.Load(&configPath)
+	cfg, err := Load(&configPath)
 	if err != nil {
-		fmt.Printf("Failed to load config: %v\n", err.Error())
-		os.Exit(1)
+		return fmt.Errorf("Failed to load config: %s", err)
+	}
+
+	err = CleanAndValidate(cfg)
+	if err != nil {
+		return fmt.Errorf("Invalid configuration: %s", err)
+	}
+
+	if *validateFlag {
+		fmt.Printf("No problems found in config from %s. Looks good to me!\n", configPath)
+		return nil
 	}
 
 	// build sink
 	activeSink, err := sink.BuildSink(&cfg.Sink)
 	if err != nil {
-		log.Printf("Failed to setup metric sink: %v\n", err.Error())
-		os.Exit(1)
+		return fmt.Errorf("Failed to setup metric sink: %s", err)
 	}
 
 	// build the list of real agents
@@ -138,8 +128,7 @@ func main() {
 	for _, a := range agentList {
 		err = agents.SpawnAgent(a, activeSink.(sink.Sink))
 		if err != nil {
-			log.Printf("Failed to spawn agent %v: %v", a, err.Error())
-			os.Exit(1)
+			return fmt.Errorf("Failed to spawn agent %v: %s", a, err)
 		}
 	}
 
@@ -149,68 +138,21 @@ func main() {
 	signal.Notify(signalChannel, os.Interrupt)
 	for sig := range signalChannel {
 		log.Printf("Received %v signal. Stopping.", sig)
-		os.Exit(0)
-	}
-}
-
-func LoadAndValidateConfig(path string) error {
-	cfg, err := conf.Load(&path)
-	if err != nil {
-		return err
-	}
-
-	// check base path
-	if cfg.BasePath != "" {
-		ok, cerr := regexp.MatchString(constants.ValidBasePathRegexStrict, cfg.BasePath)
-		if cerr != nil {
-			return cerr
-		}
-		if !ok {
-			return fmt.Errorf("Base path %s does not match required format", cfg.BasePath)
-		}
-	}
-
-	// check Sink config
-	_, err = sink.BuildSink(&cfg.Sink)
-	if err != nil {
-		return err
-	}
-
-	for _, c := range cfg.Agents {
-
-		// validate agent path
-		m, err := regexp.MatchString(constants.ValidAgentPathRegexStrict, c.Path)
-		if err != nil {
-			return err
-		}
-		if m == false {
-			return fmt.Errorf("%s agent path %s does not match required format", c.Type, c.Path)
-		}
-
-		if len(c.Path) > 0 && c.Path[0] == '.' {
-
-			if cfg.BasePath == "" {
-				return fmt.Errorf("%s agent path %s is relative, but no base path was specified in config", c.Type, c.Path)
-			}
-
-			c.Path = cfg.BasePath + c.Path
-		}
-
-		if c.Interval <= 0 {
-			return fmt.Errorf("%s agent interval cannot be <= 0", c.Type)
-		}
-
-		_, err = agents.BuildAgent(&c)
-		if err != nil {
-			return err
-		}
+		break
 	}
 	return nil
 }
 
+func main() {
+	if err := mainInner(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+		os.Exit(1)
+	}
+}
+
 func GenerateExampleConfig() *conf.SpoonConfig {
 	return &conf.SpoonConfig{
-		BasePath: "example",
+		BasePath: "example.%(hostname)",
 		Agents: []conf.SpoonConfigAgent{
 			conf.SpoonConfigAgent{
 				Type:     "cpu",

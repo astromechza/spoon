@@ -1,5 +1,5 @@
 {
-    "base_path": "example",
+    "base_path": "example.%(hostname-rev).metrics",
     "agents": [
         {
             "enabled": true,

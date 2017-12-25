@@ -98,10 +98,11 @@ read from `/etc/spoon.json`. This single file configures the agents,
 metrics destination, and paths. The example config, [spoon.example.json](spoon.example.json), was
 generated via the `-generate` option.
 
-See [doc/sinks.md](doc/sinks.md) for information on configuring the metrics sink
-or destination.
+Extra docs:
 
-See [doc/agents.md](doc/agents.md) for information on the agents provided.
+- [doc/sinks.md](doc/sinks.md) for configuring the metrics sink or destination.
+- [doc/agents.md](doc/agents.md) for configuring the active agents.
+- [doc/basepath.md](doc/basepath.md) for configuring the base path prefix.
 
 ## Running in production
 
