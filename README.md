@@ -66,7 +66,7 @@ Download the binary from the releases page on Github or build it yourself if you
 Add it to `/usr/bin/`, `~/bin` or wherever is appropriate. You can do this all in one step using:
 
 ```
-$ curl https://raw.githubusercontent.com/AstromechZA/spoon/master/get_spoon.sh | sudo bash
+$ curl https://raw.githubusercontent.com/AstromechZA/spoon/master/get_spoon.sh | sudo sh
 ```
 
 Setup your config file in `/etc/spoon.json`:
@@ -90,6 +90,8 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 ```
+
+**Note**: if your platform is not supported, please cut a ticket and I'll add it to the build process.
 
 ## Configuration
 
