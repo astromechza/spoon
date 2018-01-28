@@ -131,6 +131,10 @@ func mainInner() error {
 		hasErrors := false
 		group := sync.WaitGroup{}
 		for _, a := range agentList {
+			if !a.GetConfig().Enabled {
+				log.Printf("Skipping %T because it is disabled", a)
+				continue
+			}
 			group.Add(1)
 			go func(current agents.Agent) {
 				if aerr := current.Tick(activeSink.(sink.Sink)); aerr != nil {

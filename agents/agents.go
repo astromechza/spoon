@@ -56,7 +56,7 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (Agent, error) {
 // interval for that agent.
 func SpawnAgent(agent Agent, s sink.Sink) error {
 
-	if agent.GetConfig().Enabled == false {
+	if !agent.GetConfig().Enabled {
 		log.Printf("Skipping agent %v because it is disabled.", agent.GetConfig())
 		return nil
 	}
