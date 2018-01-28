@@ -70,9 +70,10 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 		// name comes from container name itself
 		name := strings.Replace(strings.Trim(c.Names[0], "/"), ".", "_", -1)
 		id := c.ID
+		uptime := time.Now().Sub(time.Unix(c.Created, 0))
 		wg.Add(1)
 		go func() {
-			a.doStatsForContainer(s, cli, id, name)
+			a.doStatsForContainer(s, cli, id, name, uptime)
 			wg.Done()
 		}()
 	}
@@ -80,7 +81,7 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 	return nil
 }
 
-func (a *dockerAgent) doStatsForContainer(s sink.Sink, cli *client.Client, cid, cname string) {
+func (a *dockerAgent) doStatsForContainer(s sink.Sink, cli *client.Client, cid, cname string, uptime time.Duration) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(a.config.Interval)*time.Second)
 	data, err := cli.ContainerStats(ctx, cid, false)
 	if err != nil {
@@ -95,6 +96,7 @@ func (a *dockerAgent) doStatsForContainer(s sink.Sink, cli *client.Client, cid, 
 		return
 	}
 
+	s.Gauge(fmt.Sprintf("%s.%s.uptime", a.config.Path, cname), uptime.Seconds())
 	s.Gauge(fmt.Sprintf("%s.%s.cpus.usage.percent", a.config.Path, cname), calculateCPUPercent(stats))
 	s.Gauge(fmt.Sprintf("%s.%s.memory.usage.bytes", a.config.Path, cname), calculateMemoryBytes(stats))
 	s.Gauge(fmt.Sprintf("%s.%s.memory.usage.percent", a.config.Path, cname), calculateMemoryUsage(stats))
