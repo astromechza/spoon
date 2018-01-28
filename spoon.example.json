@@ -9,7 +9,7 @@
             "settings": null
         },
         {
-            "enabled": true,
+            "enabled": false,
             "type": "disk",
             "interval": 60,
             "path": ".disk",
@@ -65,6 +65,15 @@
                     "-c",
                     "import random; print '.test.path', random.randint(-100, 100)"
                 ]
+            }
+        },
+        {
+            "enabled": true,
+            "type": "docker",
+            "interval": 30,
+            "path": ".containers",
+            "settings": {
+
             }
         }
     ],

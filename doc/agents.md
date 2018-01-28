@@ -269,3 +269,25 @@ The `uptime` agent reports the uptime of the machine in seconds.
 ```
 . -> seconds
 ```
+
+## `docker` Agent
+
+The `docker` reports resource usage of running containers on the host.
+
+Some minimal settings are available:
+
+```
+"settings": {
+    "container_label": <label on containers to measure>
+}
+```
+
+Example output:
+
+```
+.<container name>.cpus.usage.percent -> float
+.<container name>.memory.usage.bytes -> integer
+.<container name>.memory.usage.percent -> float
+.<container name>.networks.eth0.rx.bytes -> integer
+.<container name>.networks.eth0.tx.bytes -> integer
+```

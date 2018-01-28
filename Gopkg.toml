@@ -5,3 +5,6 @@
 
 [[constraint]]
   name = "github.com/AstromechZA/go-statsd"
+
+[[constraint]]
+  name = "github.com/docker/docker"
