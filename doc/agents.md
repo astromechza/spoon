@@ -55,7 +55,7 @@ The `settings` for a cmd agent should specify the cmd string array to execute:
 For each line in the stdout that contains a relative or absolute metric path
 followed by a numeric value, a metric will be generated.
 
-For example:
+For example, output like the following:
 
 ```
 this.line.will -123.125125
@@ -63,11 +63,13 @@ this.line.will -123.125125
 This line won't generate a value
 ```
 
-Will generate
+Could generate the following:
 
 ```
 this.line.will -> -123.125125
-.relative.path.example -> 0
+.values.relative.path.example -> 0
+.elapsed_seconds -> 0.123
+.exit_code -> 0
 ```
 
 The `cmd` agent is the only agent allowed to post metrics with absolute path
@@ -235,31 +237,6 @@ current unix time as number of nanoseconds since January 1, 1970 UTC.
 
 ```
 . -> nanoseconds
-```
-
-## `timed` Agent
-
-The `timed` agent is a variation on the `cmd` agent above which simply logs the
-time taken for the command to be run. This can often be very useful when you
-want to measure simpler things without writing logic for it. A useful example
-is a `ping` check or anything to do a quick speed test.
-
-The `ignore_error` setting has been added which when set will submit a value
-even if the command fails.
-
-```
-"settings": {
-    "cmd": [
-        "python",
-        "-c",
-        "import random; print '.test.path', random.randint(-100, 100)"
-    ],
-    "ignore_error": false
-}
-```
-
-```
-. -> elapsed seconds
 ```
 
 ## `uptime` Agent

@@ -7,10 +7,13 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/AstromechZA/spoon/conf"
 	"github.com/AstromechZA/spoon/constants"
 	"github.com/AstromechZA/spoon/sink"
+	"golang.org/x/net/context"
 )
 
 type cmdAgent struct {
@@ -56,12 +59,24 @@ func (a *cmdAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *cmdAgent) Tick(s sink.Sink) error {
-
-	out, err := exec.Command(a.cmd[0], a.cmd[1:]...).Output()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(a.config.Interval)*time.Second)
+	cmd := exec.CommandContext(ctx, a.cmd[0], a.cmd[1:]...)
+	defer cancel()
+	start := time.Now()
+	exitcode := 0
+	out, err := cmd.Output()
 	if err != nil {
-		log.Printf("%v command failed %v: %s", a.cmd[0], err, err.(*exec.ExitError).Stderr)
-		return err
+		if ee, ok := err.(*exec.ExitError); ok {
+			log.Printf("%v command failed %s: %s", a.cmd[0], err, ee.Stderr)
+			ws := ee.Sys().(syscall.WaitStatus)
+			exitcode = ws.ExitStatus()
+		} else {
+			log.Printf("%v command failed %s", a.cmd[0], err)
+		}
 	}
+	s.Gauge(a.config.Path+".exit_code", exitcode)
+	elapsed := time.Now().Sub(start)
+	s.Gauge(a.config.Path+".elapsed_seconds", elapsed.Seconds())
 
 	lines := strings.Split(string(out), "\n")
 	for _, line := range lines {
@@ -74,7 +89,7 @@ func (a *cmdAgent) Tick(s sink.Sink) error {
 				log.Printf("Path %v had value %v which was not a valid 64bit float", subpath, groups[2])
 			}
 			if subpath[0] == '.' {
-				subpath = a.config.Path + subpath
+				subpath = a.config.Path + ".values" + subpath
 			}
 			s.Gauge(subpath, value)
 		}

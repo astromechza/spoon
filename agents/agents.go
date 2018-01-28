@@ -45,8 +45,6 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (Agent, error) {
 		return NewCMDAgent(agentConfig)
 	case "random":
 		return NewRandomAgent(agentConfig)
-	case "timed":
-		return NewTimedCMDAgent(agentConfig)
 	case "docker":
 		return NewDockerAgent(agentConfig)
 	default:

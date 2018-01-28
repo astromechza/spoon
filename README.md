@@ -119,15 +119,15 @@ It will accept a SIGINT in order to stop gracefully.
 
 ## Agent Types
 
-- `time`: just returns the unix nanoseconds
-- `meta`: returns the cpu percent and RSS usage of the Spoon process.
+- `cmd`: log metrics gathered from a shell command
 - `cpu`: returns cpu percentage per core
 - `disk`: returns disk usage and io counters if available per physical partition and disk
-- `mem`: returns system memory and swap usage
-- `uptime`: just returns the machines uptime value
-- `net`: returns sent/recv info for interfaces
-- `cmd`: allows user to run their own command
 - `docker`: measure resource usage of docker containers
+- `mem`: returns system memory and swap usage
+- `meta`: returns the cpu percent and RSS usage of the Spoon process.
+- `net`: returns sent/recv info for interfaces
+- `time`: just returns the unix seconds
+- `uptime`: just returns the machines uptime in seconds
 
 More detail available on the [agents documentation](doc/agents.md).
 
