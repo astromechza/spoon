@@ -127,6 +127,7 @@ It will accept a SIGINT in order to stop gracefully.
 - `uptime`: just returns the machines uptime value
 - `net`: returns sent/recv info for interfaces
 - `cmd`: allows user to run their own command
+- `docker`: measure resource usage of docker containers
 
 More detail available on the [agents documentation](doc/agents.md).
 

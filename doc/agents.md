@@ -274,11 +274,14 @@ The `uptime` agent reports the uptime of the machine in seconds.
 
 The `docker` reports resource usage of running containers on the host.
 
-Some minimal settings are available:
+The `container_filters` setting can be used to restrict which containers are
+reported on:
 
 ```
 "settings": {
-    "container_label": <label on containers to measure>
+    "container_filters": {
+        "label": "has_stats",
+    }
 }
 ```
 

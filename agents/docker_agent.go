@@ -19,16 +19,26 @@ import (
 )
 
 type dockerAgent struct {
-	config         conf.SpoonConfigAgent
-	containerLabel string
+	config           conf.SpoonConfigAgent
+	containerFilters map[string]string
 }
 
 func NewDockerAgent(config *conf.SpoonConfigAgent) (Agent, error) {
 	agent := &dockerAgent{
-		config: (*config),
+		config:           (*config),
+		containerFilters: make(map[string]string),
 	}
-	if v, ok := config.Settings["container_label"]; ok {
-		agent.containerLabel = v.(string)
+	if v, ok := config.Settings["container_filters"]; ok {
+		m, ok := v.(map[string]interface{})
+		if !ok {
+			return agent, fmt.Errorf("failed to convert container_filters to map")
+		}
+		for k, v := range m {
+			agent.containerFilters[k], ok = v.(string)
+			if !ok {
+				return agent, fmt.Errorf("value for container_filters %s was not a string", k)
+			}
+		}
 	}
 	return agent, nil
 }
@@ -45,7 +55,10 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 	}
 
 	filters := filters.NewArgs()
-	filters.ExactMatch("state", "running")
+	filters.Add("status", "running")
+	for k, v := range a.containerFilters {
+		filters.Add(k, v)
+	}
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{Filters: filters})
 	if err != nil {
 		return fmt.Errorf("failed to list containers: %s", err)
@@ -57,14 +70,6 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 		// name comes from container name itself
 		name := strings.Replace(strings.Trim(c.Names[0], "/"), ".", "_", -1)
 		id := c.ID
-
-		// if setting is defined, only run on labeled containers
-		if a.containerLabel != "" {
-			if _, ok := c.Labels[a.containerLabel]; !ok {
-				continue
-			}
-		}
-
 		wg.Add(1)
 		go func() {
 			a.doStatsForContainer(s, cli, id, name)

@@ -9,7 +9,7 @@
             "settings": null
         },
         {
-            "enabled": false,
+            "enabled": true,
             "type": "disk",
             "interval": 60,
             "path": ".disk",
@@ -73,7 +73,8 @@
             "interval": 30,
             "path": ".containers",
             "settings": {
-
+                "container_filters": {
+                }
             }
         }
     ],

@@ -134,7 +134,7 @@ func mainInner() error {
 			group.Add(1)
 			go func(current agents.Agent) {
 				if aerr := current.Tick(activeSink.(sink.Sink)); aerr != nil {
-					log.Printf("%s Error: %s", current, err)
+					log.Printf("Error: %T: %s", current, aerr)
 					hasErrors = true
 				}
 				group.Done()
