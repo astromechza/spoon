@@ -47,6 +47,8 @@ func BuildAgent(agentConfig *conf.SpoonConfigAgent) (Agent, error) {
 		return NewRandomAgent(agentConfig)
 	case "timed":
 		return NewTimedCMDAgent(agentConfig)
+	case "docker":
+		return NewDockerAgent(agentConfig)
 	default:
 		return nil, fmt.Errorf("Unrecognised agent type '%v'", agentConfig.Type)
 	}
