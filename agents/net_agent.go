@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
@@ -12,22 +13,23 @@ import (
 )
 
 type netAgent struct {
-	config   conf.SpoonConfigAgent
-	settings map[string]string
+	netAgentSettings
+	config conf.SpoonConfigAgent
+}
+
+type netAgentSettings struct {
+	NicRegex string `json:"nic_regex"`
 }
 
 func NewNetAgent(config *conf.SpoonConfigAgent) (Agent, error) {
-
-	settings := make(map[string]string, 0)
-	for k, v := range config.Settings {
-		vs, ok := v.(string)
-		if ok == false {
-			return nil, fmt.Errorf("Error casting settings value %v to string", v)
-		}
-		settings[k] = vs
+	s := netAgentSettings{}
+	if err := json.Unmarshal(config.SettingsRaw, &s); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %s", err)
 	}
-
-	return &netAgent{config: (*config), settings: settings}, nil
+	return &netAgent{
+		netAgentSettings: s,
+		config:           (*config),
+	}, nil
 }
 
 func (a *netAgent) GetConfig() conf.SpoonConfigAgent {
@@ -41,10 +43,9 @@ func (a *netAgent) Tick(s sink.Sink) error {
 		return err
 	}
 
-	nicre := a.settings["nic_regex"]
 	for _, nicio := range iocounters {
-		if nicre != "" {
-			m, _ := regexp.MatchString(nicre, nicio.Name)
+		if a.NicRegex != "" {
+			m, _ := regexp.MatchString(a.NicRegex, nicio.Name)
 			if m == false {
 				continue
 			}

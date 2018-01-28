@@ -19,26 +19,23 @@ import (
 )
 
 type dockerAgent struct {
-	config           conf.SpoonConfigAgent
-	containerFilters map[string]string
+	dockerAgentSettings
+	config conf.SpoonConfigAgent
+}
+
+type dockerAgentSettings struct {
+	ContainerFilters map[string]string
 }
 
 func NewDockerAgent(config *conf.SpoonConfigAgent) (Agent, error) {
-	agent := &dockerAgent{
-		config:           (*config),
-		containerFilters: make(map[string]string),
+	s := dockerAgentSettings{}
+	if err := json.Unmarshal(config.SettingsRaw, &s); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %s", err)
 	}
-	if v, ok := config.Settings["container_filters"]; ok {
-		m, ok := v.(map[string]interface{})
-		if !ok {
-			return agent, fmt.Errorf("failed to convert container_filters to map")
-		}
-		for k, v := range m {
-			agent.containerFilters[k], ok = v.(string)
-			if !ok {
-				return agent, fmt.Errorf("value for container_filters %s was not a string", k)
-			}
-		}
+
+	agent := &dockerAgent{
+		dockerAgentSettings: s,
+		config:              (*config),
 	}
 	return agent, nil
 }
@@ -56,7 +53,7 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 
 	filters := filters.NewArgs()
 	filters.Add("status", "running")
-	for k, v := range a.containerFilters {
+	for k, v := range a.ContainerFilters {
 		filters.Add(k, v)
 	}
 	containers, err := cli.ContainerList(ctx, types.ContainerListOptions{Filters: filters})

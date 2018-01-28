@@ -1,6 +1,7 @@
 package sink
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -12,14 +13,21 @@ type StatsdSink struct {
 	client *statsd.Client
 }
 
+type StatsdSinkSettings struct {
+	Address string `json:"address"`
+}
+
 func NewStatsdSink(cfg *conf.SpoonConfigSink) (*StatsdSink, error) {
-	addr, ok := cfg.Settings["address"]
-	if !ok {
+	s := &StatsdSinkSettings{}
+	if err := json.Unmarshal(cfg.SettingsRaw, s); err != nil {
+		return nil, fmt.Errorf("failed to parse statsd settings: %s", err)
+	}
+	if s.Address == "" {
 		return nil, fmt.Errorf("statsd sink settings missing 'address'")
 	}
 
 	client, err := statsd.New(
-		statsd.Address(addr.(string)),
+		statsd.Address(s.Address),
 		statsd.ErrorHandler(func(e error) {
 			log.Printf("Statsd sink error: %s", e)
 		}),

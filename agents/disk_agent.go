@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
@@ -13,24 +14,23 @@ import (
 )
 
 type diskAgent struct {
+	diskAgentSettings
 	config   conf.SpoonConfigAgent
 	settings map[string]string
 }
 
+type diskAgentSettings struct {
+	DeviceRegex string `json:"device_regex"`
+}
+
 func NewDiskAgent(config *conf.SpoonConfigAgent) (Agent, error) {
-
-	settings := make(map[string]string, 0)
-	for k, v := range config.Settings {
-		vs, ok := v.(string)
-		if ok == false {
-			return nil, fmt.Errorf("Error casting settings value %v to string", v)
-		}
-		settings[k] = vs
+	s := diskAgentSettings{}
+	if err := json.Unmarshal(config.SettingsRaw, &s); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %s", err)
 	}
-
 	return &diskAgent{
-		config:   (*config),
-		settings: settings,
+		diskAgentSettings: s,
+		config:            (*config),
 	}, nil
 }
 
@@ -40,8 +40,6 @@ func (a *diskAgent) GetConfig() conf.SpoonConfigAgent {
 
 func (a *diskAgent) Tick(s sink.Sink) error {
 
-	devre := a.settings["device_regex"]
-
 	// fetch all the physical disk partitions. the boolean indicates whether
 	// non-physical partitions should be returned too.
 	parts, err := disk.Partitions(true)
@@ -50,7 +48,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 		for _, p := range parts {
 
 			// check against regex if provided
-			if m, _ := regexp.MatchString(devre, p.Device); m == false {
+			if m, _ := regexp.MatchString(a.DeviceRegex, p.Device); m == false {
 				continue
 			}
 
@@ -83,7 +81,7 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 			deviceName := "/dev/" + path
 
 			// check against regex if provided
-			if m, _ := regexp.MatchString(devre, deviceName); m == false {
+			if m, _ := regexp.MatchString(a.DeviceRegex, deviceName); m == false {
 				continue
 			}
 

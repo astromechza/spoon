@@ -1,7 +1,9 @@
 package agents
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -17,40 +19,29 @@ import (
 )
 
 type cmdAgent struct {
+	cmdAgentSettings
 	config     conf.SpoonConfigAgent
-	cmd        []string
 	lineRegexp regexp.Regexp
 }
 
+type cmdAgentSettings struct {
+	Command []string `json:"cmd"`
+}
+
 func NewCMDAgent(config *conf.SpoonConfigAgent) (Agent, error) {
-
-	cmditem, ok := config.Settings["cmd"]
-	if ok == false {
-		return nil, errors.New("cmdAgent requires a 'cmd' array in the settings dictionary")
+	s := cmdAgentSettings{}
+	if err := json.Unmarshal(config.SettingsRaw, &s); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %s", err)
 	}
 
-	cmditems, ok := cmditem.([]interface{})
-	if ok == false {
-		return nil, errors.New("cmdAgent requires the 'cmd' setting to be an array")
-	}
-
-	if len(cmditems) < 1 {
+	if len(s.Command) < 1 {
 		return nil, errors.New("cmdAgent 'cmd' setting must have at least one item")
 	}
 
-	cmdStringItems := make([]string, len(cmditems))
-	for i, a := range cmditems {
-		sa, ok := a.(string)
-		if ok == false {
-			return nil, errors.New("cmdAgent 'cmd' setting should only contain strings")
-		}
-		cmdStringItems[i] = sa
-	}
-
 	return &cmdAgent{
-		config:     *config,
-		cmd:        cmdStringItems,
-		lineRegexp: *regexp.MustCompile("^(" + constants.ValidAgentPathRegex + ")*\\s+([\\-0-9\\.]+)\\s*$"),
+		cmdAgentSettings: s,
+		config:           *config,
+		lineRegexp:       *regexp.MustCompile("^(" + constants.ValidAgentPathRegex + ")*\\s+([\\-0-9\\.]+)\\s*$"),
 	}, nil
 }
 
@@ -60,18 +51,18 @@ func (a *cmdAgent) GetConfig() conf.SpoonConfigAgent {
 
 func (a *cmdAgent) Tick(s sink.Sink) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(a.config.Interval)*time.Second)
-	cmd := exec.CommandContext(ctx, a.cmd[0], a.cmd[1:]...)
+	cmd := exec.CommandContext(ctx, a.Command[0], a.Command[1:]...)
 	defer cancel()
 	start := time.Now()
 	exitcode := 0
 	out, err := cmd.Output()
 	if err != nil {
 		if ee, ok := err.(*exec.ExitError); ok {
-			log.Printf("%v command failed %s: %s", a.cmd[0], err, ee.Stderr)
+			log.Printf("%v command failed %s: %s", a.Command[0], err, ee.Stderr)
 			ws := ee.Sys().(syscall.WaitStatus)
 			exitcode = ws.ExitStatus()
 		} else {
-			log.Printf("%v command failed %s", a.cmd[0], err)
+			log.Printf("%v command failed %s", a.Command[0], err)
 		}
 	}
 	s.Gauge(a.config.Path+".exit_code", exitcode)

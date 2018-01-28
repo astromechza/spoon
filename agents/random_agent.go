@@ -1,10 +1,9 @@
 package agents
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/AstromechZA/spoon/conf"
@@ -12,41 +11,33 @@ import (
 )
 
 type randomAgent struct {
-	config   conf.SpoonConfigAgent
-	minValue float64
-	maxValue float64
-	random   *rand.Rand
+	randomAgentSettings
+	config conf.SpoonConfigAgent
+	random *rand.Rand
+}
+
+type randomAgentSettings struct {
+	Min float64 `json:"min"`
+	Max float64 `json:"max"`
 }
 
 func NewRandomAgent(config *conf.SpoonConfigAgent) (Agent, error) {
-	minVal := float64(0)
-	maxVal := float64(100)
-	var err error
-	v, found := config.Settings["min"]
-	if found == true {
-		minVal, err = strconv.ParseFloat(fmt.Sprintf("%v", v), 64)
-		if err != nil {
-			return nil, errors.New("Failed to parse min for randomAgent as float64")
-		}
+	s := randomAgentSettings{
+		Min: 0,
+		Max: 100,
+	}
+	if err := json.Unmarshal(config.SettingsRaw, &s); err != nil {
+		return nil, fmt.Errorf("failed to parse settings: %s", err)
 	}
 
-	v, found = config.Settings["max"]
-	if found == true {
-		maxVal, err = strconv.ParseFloat(fmt.Sprintf("%v", v), 64)
-		if err != nil {
-			return nil, errors.New("Failed to parse max for randomAgent as float64")
-		}
-	}
-
-	if maxVal <= minVal {
-		return nil, fmt.Errorf("max (%f) for randomAgent must be greater than min (%f)", maxVal, minVal)
+	if s.Max <= s.Min {
+		return nil, fmt.Errorf("max (%f) for randomAgent must be greater than min (%f)", s.Max, s.Min)
 	}
 
 	return &randomAgent{
-		config:   (*config),
-		minValue: minVal,
-		maxValue: maxVal,
-		random:   rand.New(rand.NewSource(time.Now().UnixNano())),
+		randomAgentSettings: s,
+		config:              (*config),
+		random:              rand.New(rand.NewSource(time.Now().UnixNano())),
 	}, nil
 }
 
@@ -55,8 +46,8 @@ func (a *randomAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *randomAgent) Tick(s sink.Sink) error {
-	rng := a.maxValue - a.minValue
-	v := a.random.Float64()*rng + a.minValue
+	rng := a.Max - a.Min
+	v := a.random.Float64()*rng + a.Min
 	s.Gauge(a.config.Path, v)
 	return nil
 }
