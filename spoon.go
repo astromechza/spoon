@@ -68,7 +68,7 @@ func mainInner() error {
 
 	// first handle generate and validate
 	if *generateFlag {
-		bytes, err := json.MarshalIndent(GenerateExampleConfig(), "", "    ")
+		bytes, err := json.MarshalIndent(conf.GenerateExampleConfig(), "", "    ")
 		if err != nil {
 			return fmt.Errorf("Failed to serialise config: %v", err)
 		}
@@ -170,91 +170,5 @@ func main() {
 	if err := mainInner(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 		os.Exit(1)
-	}
-}
-
-func GenerateExampleConfig() *conf.SpoonConfig {
-	return &conf.SpoonConfig{
-		BasePath: "example.%(hostname)",
-		Agents: []conf.SpoonConfigAgent{
-			conf.SpoonConfigAgent{
-				Type:     "cmd",
-				Interval: float32(30),
-				Path:     ".cmd",
-				Settings: map[string]interface{}{
-					"cmd": []string{
-						"python",
-						"-c",
-						"import random; print '.test.path_value', random.randint(-100, 100)",
-					},
-				},
-				Enabled: true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "cpu",
-				Interval: float32(60),
-				Path:     ".cpu",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "disk",
-				Interval: float32(60),
-				Path:     ".disk",
-				Enabled:  true,
-				Settings: map[string]interface{}{
-					"device_regex": "da\\d$|disk\\d$",
-				},
-			},
-			conf.SpoonConfigAgent{
-				Type:     "docker",
-				Interval: float32(30),
-				Path:     ".containers",
-				Settings: map[string]interface{}{
-					"container_filters": map[string]interface{}{},
-				},
-			},
-			conf.SpoonConfigAgent{
-				Type:     "mem",
-				Interval: float32(60),
-				Path:     ".mem",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "meta",
-				Interval: float32(30),
-				Path:     ".meta",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "net",
-				Interval: float32(60),
-				Path:     ".net",
-				Settings: map[string]interface{}{
-					"nic_regex": "^e(th|n|m)\\d$",
-				},
-				Enabled: true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "random",
-				Interval: float32(10),
-				Path:     ".random",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "time",
-				Interval: float32(10),
-				Path:     ".time_unix_seconds",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "uptime",
-				Interval: float32(60),
-				Path:     ".uptime_seconds",
-				Enabled:  true,
-			},
-		},
-		Sink: conf.SpoonConfigSink{
-			Type: "log",
-		},
 	}
 }
