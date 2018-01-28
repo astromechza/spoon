@@ -59,12 +59,12 @@ func (a *diskAgent) Tick(s sink.Sink) error {
 				log.Printf("Outputting Usage for %v because it matched device_regex", p.Device)
 				prefixPath := fmt.Sprintf("%s.%s", a.config.Path, a.formatDeviceName(p.Device))
 
-				s.Gauge(fmt.Sprintf("%s.total", prefixPath), float64(usage.Total))
-				s.Gauge(fmt.Sprintf("%s.free", prefixPath), float64(usage.Free))
-				s.Gauge(fmt.Sprintf("%s.used", prefixPath), float64(usage.Used))
+				s.Gauge(fmt.Sprintf("%s.total_bytes", prefixPath), float64(usage.Total))
+				s.Gauge(fmt.Sprintf("%s.free_bytes", prefixPath), float64(usage.Free))
+				s.Gauge(fmt.Sprintf("%s.used_bytes", prefixPath), float64(usage.Used))
 				s.Gauge(fmt.Sprintf("%s.used_percent", prefixPath), float64(usage.UsedPercent))
-				s.Gauge(fmt.Sprintf("%s.inode_free", prefixPath), float64(usage.InodesFree))
-				s.Gauge(fmt.Sprintf("%s.inode_used", prefixPath), float64(usage.InodesUsed))
+				s.Gauge(fmt.Sprintf("%s.inode_free_count", prefixPath), float64(usage.InodesFree))
+				s.Gauge(fmt.Sprintf("%s.inode_used_count", prefixPath), float64(usage.InodesUsed))
 				s.Gauge(fmt.Sprintf("%s.inode_used_percent", prefixPath), float64(usage.InodesUsedPercent))
 
 			} else {

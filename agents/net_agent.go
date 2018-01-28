@@ -52,10 +52,10 @@ func (a *netAgent) Tick(s sink.Sink) error {
 		log.Printf("Outputting metrics for %v because it matched nic_regex", nicio.Name)
 		prefixPath := fmt.Sprintf("%s.%s", a.config.Path, nicio.Name)
 
-		s.Gauge(fmt.Sprintf("%s.bytes_sent", prefixPath), float64(nicio.BytesSent))
-		s.Gauge(fmt.Sprintf("%s.bytes_recv", prefixPath), float64(nicio.BytesRecv))
-		s.Gauge(fmt.Sprintf("%s.packets_sent", prefixPath), float64(nicio.PacketsSent))
-		s.Gauge(fmt.Sprintf("%s.packets_recv", prefixPath), float64(nicio.PacketsRecv))
+		s.Gauge(fmt.Sprintf("%s.tx_bytes", prefixPath), float64(nicio.BytesSent))
+		s.Gauge(fmt.Sprintf("%s.rx_bytes", prefixPath), float64(nicio.BytesRecv))
+		s.Gauge(fmt.Sprintf("%s.tx_packets", prefixPath), float64(nicio.PacketsSent))
+		s.Gauge(fmt.Sprintf("%s.rx_packets", prefixPath), float64(nicio.PacketsRecv))
 
 		// TODO do we need the error and dropped counts?
 	}

@@ -1,6 +1,19 @@
 {
-    "base_path": "example.%(hostname-rev).metrics",
+    "base_path": "example.%(hostname)",
     "agents": [
+        {
+            "enabled": true,
+            "type": "cmd",
+            "interval": 30,
+            "path": ".cmd",
+            "settings": {
+                "cmd": [
+                    "python",
+                    "-c",
+                    "import random; print '.test.path_value', random.randint(-100, 100)"
+                ]
+            }
+        },
         {
             "enabled": true,
             "type": "cpu",
@@ -14,7 +27,16 @@
             "interval": 60,
             "path": ".disk",
             "settings": {
-                "device_regex": ""
+                "device_regex": "da\\d$|disk\\d$"
+            }
+        },
+        {
+            "enabled": false,
+            "type": "docker",
+            "interval": 30,
+            "path": ".containers",
+            "settings": {
+                "container_filters": {}
             }
         },
         {
@@ -28,21 +50,7 @@
             "enabled": true,
             "type": "meta",
             "interval": 30,
-            "path": ".spoon_process",
-            "settings": null
-        },
-        {
-            "enabled": true,
-            "type": "time",
-            "interval": 10,
-            "path": ".time",
-            "settings": null
-        },
-        {
-            "enabled": true,
-            "type": "uptime",
-            "interval": 60,
-            "path": ".uptime",
+            "path": ".meta",
             "settings": null
         },
         {
@@ -56,26 +64,24 @@
         },
         {
             "enabled": true,
-            "type": "cmd",
-            "interval": 30,
-            "path": ".cmd",
-            "settings": {
-                "cmd": [
-                    "python",
-                    "-c",
-                    "import random; print '.test.path', random.randint(-100, 100)"
-                ]
-            }
+            "type": "random",
+            "interval": 10,
+            "path": ".random",
+            "settings": null
         },
         {
             "enabled": true,
-            "type": "docker",
-            "interval": 30,
-            "path": ".containers",
-            "settings": {
-                "container_filters": {
-                }
-            }
+            "type": "time",
+            "interval": 10,
+            "path": ".time_unix_seconds",
+            "settings": null
+        },
+        {
+            "enabled": true,
+            "type": "uptime",
+            "interval": 60,
+            "path": ".uptime_seconds",
+            "settings": null
         }
     ],
     "sink": {

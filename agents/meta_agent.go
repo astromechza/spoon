@@ -92,6 +92,6 @@ func (a *metaAgent) doMem(s sink.Sink) error {
 	if err != nil {
 		return err
 	}
-	s.Gauge(a.config.Path+".rss", float64(memInfo.RSS))
+	s.Gauge(a.config.Path+".rss_bytes", int64(memInfo.RSS))
 	return nil
 }

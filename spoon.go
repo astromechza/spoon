@@ -178,6 +178,19 @@ func GenerateExampleConfig() *conf.SpoonConfig {
 		BasePath: "example.%(hostname)",
 		Agents: []conf.SpoonConfigAgent{
 			conf.SpoonConfigAgent{
+				Type:     "cmd",
+				Interval: float32(30),
+				Path:     ".cmd",
+				Settings: map[string]interface{}{
+					"cmd": []string{
+						"python",
+						"-c",
+						"import random; print '.test.path_value', random.randint(-100, 100)",
+					},
+				},
+				Enabled: true,
+			},
+			conf.SpoonConfigAgent{
 				Type:     "cpu",
 				Interval: float32(60),
 				Path:     ".cpu",
@@ -193,6 +206,14 @@ func GenerateExampleConfig() *conf.SpoonConfig {
 				},
 			},
 			conf.SpoonConfigAgent{
+				Type:     "docker",
+				Interval: float32(30),
+				Path:     ".containers",
+				Settings: map[string]interface{}{
+					"container_filters": map[string]interface{}{},
+				},
+			},
+			conf.SpoonConfigAgent{
 				Type:     "mem",
 				Interval: float32(60),
 				Path:     ".mem",
@@ -201,19 +222,7 @@ func GenerateExampleConfig() *conf.SpoonConfig {
 			conf.SpoonConfigAgent{
 				Type:     "meta",
 				Interval: float32(30),
-				Path:     ".spoon_process",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "time",
-				Interval: float32(10),
-				Path:     ".time",
-				Enabled:  true,
-			},
-			conf.SpoonConfigAgent{
-				Type:     "uptime",
-				Interval: float32(60),
-				Path:     ".uptime",
+				Path:     ".meta",
 				Enabled:  true,
 			},
 			conf.SpoonConfigAgent{
@@ -226,17 +235,22 @@ func GenerateExampleConfig() *conf.SpoonConfig {
 				Enabled: true,
 			},
 			conf.SpoonConfigAgent{
-				Type:     "cmd",
-				Interval: float32(30),
-				Path:     ".cmd",
-				Settings: map[string]interface{}{
-					"cmd": []string{
-						"python",
-						"-c",
-						"import random; print '.test.path', random.randint(-100, 100)",
-					},
-				},
-				Enabled: true,
+				Type:     "random",
+				Interval: float32(10),
+				Path:     ".random",
+				Enabled:  true,
+			},
+			conf.SpoonConfigAgent{
+				Type:     "time",
+				Interval: float32(10),
+				Path:     ".time_unix_seconds",
+				Enabled:  true,
+			},
+			conf.SpoonConfigAgent{
+				Type:     "uptime",
+				Interval: float32(60),
+				Path:     ".uptime_seconds",
+				Enabled:  true,
 			},
 		},
 		Sink: conf.SpoonConfigSink{

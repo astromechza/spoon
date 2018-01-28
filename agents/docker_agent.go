@@ -96,14 +96,14 @@ func (a *dockerAgent) doStatsForContainer(s sink.Sink, cli *client.Client, cid, 
 		return
 	}
 
-	s.Gauge(fmt.Sprintf("%s.%s.uptime", a.config.Path, cname), uptime.Seconds())
-	s.Gauge(fmt.Sprintf("%s.%s.cpus.usage.percent", a.config.Path, cname), calculateCPUPercent(stats))
-	s.Gauge(fmt.Sprintf("%s.%s.memory.usage.bytes", a.config.Path, cname), calculateMemoryBytes(stats))
-	s.Gauge(fmt.Sprintf("%s.%s.memory.usage.percent", a.config.Path, cname), calculateMemoryUsage(stats))
+	s.Gauge(fmt.Sprintf("%s.%s.uptime_seconds", a.config.Path, cname), uptime.Seconds())
+	s.Gauge(fmt.Sprintf("%s.%s.cpus.usage_percent", a.config.Path, cname), calculateCPUPercent(stats))
+	s.Gauge(fmt.Sprintf("%s.%s.memory.usage_bytes", a.config.Path, cname), calculateMemoryBytes(stats))
+	s.Gauge(fmt.Sprintf("%s.%s.memory.usage_percent", a.config.Path, cname), calculateMemoryUsage(stats))
 
 	for iface, nstats := range stats.Networks {
-		s.Gauge(fmt.Sprintf("%s.%s.networks.%s.rx.bytes", a.config.Path, cname, iface), float64(nstats.RxBytes))
-		s.Gauge(fmt.Sprintf("%s.%s.networks.%s.tx.bytes", a.config.Path, cname, iface), float64(nstats.TxBytes))
+		s.Gauge(fmt.Sprintf("%s.%s.networks.%s.rx_bytes", a.config.Path, cname, iface), float64(nstats.RxBytes))
+		s.Gauge(fmt.Sprintf("%s.%s.networks.%s.tx_bytes", a.config.Path, cname, iface), float64(nstats.TxBytes))
 		// TODO: can do a lot more here with packets/dropped/errors
 	}
 }

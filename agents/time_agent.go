@@ -20,6 +20,6 @@ func (a *timeAgent) GetConfig() conf.SpoonConfigAgent {
 }
 
 func (a *timeAgent) Tick(s sink.Sink) error {
-	s.Gauge(a.config.Path, float64(time.Now().UnixNano()))
+	s.Gauge(a.config.Path, float64(time.Now().Unix()))
 	return nil
 }
