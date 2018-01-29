@@ -41,7 +41,7 @@ func GenerateExampleConfig() *SpoonConfig {
 			SpoonConfigAgent{
 				internalSpoonConfigAgent{
 					Type:     "docker",
-					Enabled:  false,
+					Enabled:  true,
 					Interval: float32(30),
 					Path:     ".containers",
 					Settings: map[string]interface{}{

@@ -8,4 +8,8 @@
 
 [[constraint]]
   name = "github.com/docker/docker"
-  version = "v17.03.2-ce"
+  revision = "e11bf870a3170a1d2b1e177a0d7ccc66200bd643"
+
+[[override]]
+  name = "github.com/docker/distribution"
+  revision = "edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c"

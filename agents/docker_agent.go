@@ -50,6 +50,7 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 	if err != nil {
 		return fmt.Errorf("failed to setup docker client: %s", err)
 	}
+	cli.NegotiateAPIVersion(ctx)
 
 	filters := filters.NewArgs()
 	filters.Add("status", "running")
