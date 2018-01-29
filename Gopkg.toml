@@ -8,3 +8,4 @@
 
 [[constraint]]
   name = "github.com/docker/docker"
+  version = "v17.03.2-ce"
