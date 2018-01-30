@@ -8,6 +8,8 @@ script:
 - ./spoon -generate > /tmp/dummy.config.json
 - ./spoon -validate -config /tmp/dummy.config.json
 - ./spoon -config /tmp/dummy.config.json -once
+before_deploy:
+- cd build && sha256sum spoon-* > build/SHA256SUMS
 deploy:
   provider: releases
   api_key:
@@ -16,6 +18,7 @@ deploy:
   file:
     - build/spoon-linux-amd64
     - build/spoon-darwin-amd64
+    - build/SHA256SUMS
   on:
     repo: AstromechZA/spoon
     tags: true
