@@ -51,6 +51,7 @@ func (a *dockerAgent) Tick(s sink.Sink) error {
 		return fmt.Errorf("failed to setup docker client: %s", err)
 	}
 	cli.NegotiateAPIVersion(ctx)
+	defer cli.Close()
 
 	filters := filters.NewArgs()
 	filters.Add("status", "running")
@@ -87,7 +88,7 @@ func (a *dockerAgent) doStatsForContainer(s sink.Sink, cli *client.Client, cid, 
 		return
 	}
 	defer data.Body.Close()
-	cancel()
+	defer cancel()
 	stats := new(types.StatsJSON)
 	if err = json.NewDecoder(data.Body).Decode(stats); err != nil {
 		log.Printf("failed to parse stats from container %s: %s", cid, err)
